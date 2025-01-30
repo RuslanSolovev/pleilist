@@ -7,6 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.com.example.playlistmaker.MediaActivity
+import com.example.playlistmaker.com.example.playlistmaker.SearchActivity
+import com.example.playlistmaker.com.example.playlistmaker.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
