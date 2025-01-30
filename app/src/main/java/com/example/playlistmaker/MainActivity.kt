@@ -19,24 +19,24 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Находим кнопки по их ID
+
+
+
+
         val buttonPoisk = findViewById<Button>(R.id.button_poisk)
-        val buttonMusika = findViewById<Button>(R.id.button_musika)
-        val buttonNastroi = findViewById<Button>(R.id.button_nastroi)
-
-
         buttonPoisk.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
 
 
+        val buttonMusika = findViewById<Button>(R.id.button_musika)
         buttonMusika.setOnClickListener {
             val intent = Intent(this, MediaActivity::class.java)
             startActivity(intent)
         }
 
-
+        val buttonNastroi = findViewById<Button>(R.id.button_nastroi)
         buttonNastroi.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
