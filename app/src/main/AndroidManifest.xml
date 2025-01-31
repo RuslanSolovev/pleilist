@@ -26,11 +26,9 @@
         <activity
             android:name=".com.example.playlistmaker.SettingsActivity" />
 
-        <activity
-            android:name=".com.example.playlistmaker.SearchActivity" />
+        <activity android:name=".SearchActivity" />
 
-        <activity
-            android:name=".com.example.playlistmaker.MediaActivity" />
+        <activity android:name=".MediaActivity" />
 
 
 
