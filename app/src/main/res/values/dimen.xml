@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tekst_size">22sp</dimen>
+    <dimen name="tekst_size2">16sp</dimen>
+    <dimen name="otstup_mini">4dp</dimen>
+
+    <dimen name="otstup_big">16dp</dimen>
+    <dimen name="iconka_otstup">1dp</dimen>
+    <dimen name="knopka_naz">48dp</dimen>
+    <dimen name="dly_menu">61dp</dimen>
+</resources>
