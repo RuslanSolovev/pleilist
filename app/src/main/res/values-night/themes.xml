@@ -35,4 +35,13 @@
 </style>
 
 
+
+<style name="dly_polzynka" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <item name="android:thumbTint">@color/polzynok3</item>
+    <item name="android:trackTint">@color/polzynok4</item>
+</style>
+
+
+
+
 </resources>

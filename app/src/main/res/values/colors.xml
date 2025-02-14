@@ -16,6 +16,12 @@
     <color name="poisk_zvet">#AEAFB4</color>
 
 
+    <color name="polzynok">#AEAFB4</color>
+    <color name="polzynok2">#E6E8EB</color>
+
+    <color name="polzynok4">#9FBBF3</color>
+    <color name="polzynok3">@color/sinii</color>
+
 
 
 </resources>

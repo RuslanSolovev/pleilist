@@ -51,12 +51,15 @@
             />
 
         <Switch
+            style="@style/dly_polzynka"
             android:id="@+id/theme_switch"
             android:layout_width="56dp"
             android:layout_height="@dimen/knopka_naz"
             android:layout_marginEnd="6dp"
             android:layout_marginBottom="11dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            />
+
     </LinearLayout>
 
     <LinearLayout

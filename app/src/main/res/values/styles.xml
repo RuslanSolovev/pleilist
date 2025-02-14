@@ -52,5 +52,9 @@
         <item name="android:tint">@color/white</item>
     </style>
 
+    <style name="dly_polzynka">
+        <item name="android:thumbTint">@color/polzynok</item>
+        <item name="android:trackTint">@color/polzynok2</item>
+    </style>
 
 </resources>
