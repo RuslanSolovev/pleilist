@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/sinii"
     android:orientation="vertical"
+    android:theme="@style/Theme.PlaylistMaker"
+
    >
 
     <FrameLayout
@@ -18,14 +20,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/app_name"
-
             android:layout_gravity="start"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@color/white"
             android:textSize="@dimen/tekst_size"
             android:layout_marginBottom="@dimen/otstup_big"
+            android:fontFamily="@font/ys_display_medium"
 
-            />
+           />
 
     </FrameLayout>
 
@@ -38,65 +40,27 @@
 
         <Button
             android:id="@+id/button_poisk"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/otstup_big"
-
-
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
-
             android:text="@string/button_poisk"
-            android:textColor="@color/black"
-            android:textSize="@dimen/tekst_size"
             app:icon="@drawable/lupa"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/iconka_otstup"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/otstup_big"
-            android:textAllCaps="false"
-            android:layout_marginHorizontal="@dimen/otstup_big"
+            style="@style/knopki_glavnoe_meny"
+
             />
 
         <Button
             android:id="@+id/button_musika"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/otstup_big"
-
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:text="@string/button_musika"
-            android:textColor="@color/black"
-            android:textSize="@dimen/tekst_size"
             app:icon="@drawable/muzika"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/iconka_otstup"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/otstup_big"
-            android:textAllCaps="false"
-            android:layout_marginHorizontal="@dimen/otstup_big"/>
+            style="@style/knopki_glavnoe_meny"
+            />
 
 
         <Button
             android:id="@+id/button_nastroi"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/otstup_big"
-
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:text="@string/button_nastroi"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/tekst_size"
-            app:cornerRadius="@dimen/otstup_big"
             app:icon="@drawable/nastroi"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/iconka_otstup"
-            app:iconTint="@color/black"
+            style="@style/knopki_glavnoe_meny"
             android:layout_marginBottom="28dp"
-            android:layout_marginHorizontal="@dimen/otstup_big"/>
+            />
 
     </LinearLayout>
 
