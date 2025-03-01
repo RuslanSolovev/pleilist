@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    style="@style/treki">
+
+    <!-- Изображение обложки -->
+    <ImageView
+        android:id="@+id/artwork_image_view"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        />
+
+    <!-- Название трека -->
+    <TextView
+        android:id="@+id/track_name_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:textSize="16sp"
+
+        android:maxLines="1"
+        android:ellipsize="end"
+
+        app:layout_constraintStart_toEndOf="@id/artwork_image_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="44dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginLeft="8dp"
+        style="@style/treki"/>
+
+    <!-- Контейнер для имени исполнителя, точки и времени трека -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/details_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/artwork_image_view"
+        app:layout_constraintTop_toBottomOf="@id/track_name_text_view"
+        android:layout_marginBottom="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginLeft="8dp">
+
+    <!-- Имя исполнителя (ширина 100dp) -->
+    <TextView
+        android:id="@+id/artist_name_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="11sp"
+        style="@style/treki"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Точка -->
+    <TextView
+        android:id="@+id/dot_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="•"
+        android:textSize="11sp"
+        style="@style/treki"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:layout_constraintStart_toEndOf="@id/artist_name_text_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Время трека -->
+    <TextView
+        android:id="@+id/track_time_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        style="@style/treki"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/dot_text_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Иконка в правом углу -->
+    <ImageView
+        android:id="@+id/icon_image_view"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="19dp"
+        app:srcCompat="@drawable/strelkapesny"
+        style="@style/treki"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>

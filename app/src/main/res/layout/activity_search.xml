@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Существующая верхняя часть разметки -->
     <LinearLayout
         android:id="@+id/top_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <ImageButton
             android:id="@+id/back_button2"
             style="@style/Theme.strelka_nazad"
@@ -19,7 +19,6 @@
             android:contentDescription="@string/nazad"
             android:src="@drawable/strelka"
             android:background="?attr/selectableItemBackground" />
-
         <TextView
             android:fontFamily="@font/ys_display_medium"
             android:layout_width="wrap_content"
@@ -32,11 +31,12 @@
             android:textSize="@dimen/tekst_size" />
     </LinearLayout>
 
+    <!-- Существующий FrameLayout для поиска -->
     <FrameLayout
+        android:id="@+id/search_frame"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_below="@id/top_layout">
-
         <EditText
             android:fontFamily="@font/ys_display_regular"
             android:id="@+id/search_edit_text"
@@ -54,8 +54,7 @@
             android:textColor="@color/black"
             android:textColorHint="@color/poisk_zvet"
             app:boxCornerRadiusTopStart="16dp"
-            android:layout_gravity="center_vertical"/>
-
+            android:layout_gravity="center_vertical" />
         <ImageButton
             android:id="@+id/clear_button"
             android:layout_width="wrap_content"
@@ -65,7 +64,18 @@
             android:visibility="gone"
             android:src="@drawable/clear"
             android:paddingRight="10dp"
-            android:background="?attr/selectableItemBackground"
-         />
+            android:background="?attr/selectableItemBackground" />
     </FrameLayout>
+
+    <!-- Новый RecyclerView ниже поля поиска -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_frame"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="vertical" />
+
 </RelativeLayout>

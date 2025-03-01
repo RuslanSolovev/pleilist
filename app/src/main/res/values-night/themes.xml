@@ -41,7 +41,12 @@
     <item name="android:trackTint">@color/polzynok4</item>
 </style>
 
+    <style name="treki">
+        <item name="android:textColor">@color/white</item>
+        <item name="tint">@color/white</item>
 
+
+    </style>
 
 
 </resources>
