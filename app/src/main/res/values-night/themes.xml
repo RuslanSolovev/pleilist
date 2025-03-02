@@ -50,6 +50,10 @@
         <item name="android:background">@drawable/bakgr</item>
     </style>
 
+    <style name="background_fon">
+        <item name="android:background">@color/chernii</item>
+    </style>
+
     <style name="zagolovok">
     <item name="android:textColor">@color/white</item>
 </style>
