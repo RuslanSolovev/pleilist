@@ -3,9 +3,13 @@
     <dimen name="tekst_size">22sp</dimen>
     <dimen name="tekst_size2">16sp</dimen>
     <dimen name="otstup_mini">4dp</dimen>
-
+    <dimen name="otstup_srednii">14dp</dimen>
     <dimen name="otstup_big">16dp</dimen>
     <dimen name="iconka_otstup">1dp</dimen>
     <dimen name="knopka_naz">48dp</dimen>
     <dimen name="dly_menu">61dp</dimen>
+    <dimen name="text_sixe3">11sp</dimen>
+    <dimen name="otstup_8">8dp</dimen>
+    <dimen name="ikonka_45">45dp</dimen>
+    <dimen name="ikonka_24">24dp</dimen>
 </resources>

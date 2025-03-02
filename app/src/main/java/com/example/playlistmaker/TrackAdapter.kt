@@ -42,7 +42,7 @@ class TrackAdapter(private val context: Context, private var tracks: List<Track>
 
             Glide.with(context)
                 .load(track.artworkUrl100)
-                .placeholder(R.drawable.soglah)
+                .placeholder(R.drawable.placeholder1)
                 .transform(RoundedCorners(2))
                 .error(R.drawable.nastroi)
                 .centerCrop()

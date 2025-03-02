@@ -57,4 +57,12 @@
         <item name="android:trackTint">@color/polzynok2</item>
     </style>
 
+    <style name="background_poisk">
+        <item name="android:background">@drawable/edit_text_background</item>
+    </style>
+
+    <style name="zagolovok">
+        <item name="android:textColor">@color/chernii</item>
+    </style>
+
 </resources>

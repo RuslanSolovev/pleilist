@@ -10,11 +10,11 @@
     <!-- Изображение обложки -->
     <ImageView
         android:id="@+id/artwork_image_view"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="@dimen/ikonka_45"
+        android:layout_height="@dimen/ikonka_45"
         android:layout_marginStart="13dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="@dimen/otstup_8"
+        android:layout_marginBottom="@dimen/otstup_8"
         android:background="?attr/selectableItemBackground"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +29,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
-        android:textSize="16sp"
+        android:textSize="@dimen/otstup_big"
 
         android:maxLines="1"
         android:ellipsize="end"
@@ -38,8 +38,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginRight="44dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginTop="@dimen/otstup_srednii"
+        android:layout_marginLeft="@dimen/otstup_8"
         style="@style/treki"/>
 
     <!-- Контейнер для имени исполнителя, точки и времени трека -->
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/artwork_image_view"
         app:layout_constraintTop_toBottomOf="@id/track_name_text_view"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="@dimen/otstup_srednii"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginLeft="8dp">
 
@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:textSize="11sp"
+        android:textSize="@dimen/text_sixe3"
         style="@style/treki"
         android:maxLines="1"
         android:ellipsize="end"
@@ -73,10 +73,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="•"
-        android:textSize="11sp"
+        android:textSize="@dimen/text_sixe3"
         style="@style/treki"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
+        android:paddingStart="@dimen/otstup_mini"
+        android:paddingEnd="@dimen/otstup_mini"
         app:layout_constraintStart_toEndOf="@id/artist_name_text_view"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -88,7 +88,7 @@
         android:layout_height="wrap_content"
 
         style="@style/treki"
-        android:textSize="11sp"
+        android:textSize="@dimen/text_sixe3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -100,8 +100,8 @@
     <!-- Иконка в правом углу -->
     <ImageView
         android:id="@+id/icon_image_view"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/ikonka_24"
+        android:layout_height="@dimen/ikonka_24"
         android:layout_marginEnd="12dp"
         android:layout_marginTop="18dp"
         android:layout_marginBottom="19dp"
