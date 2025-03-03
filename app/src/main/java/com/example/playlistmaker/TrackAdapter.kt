@@ -44,7 +44,7 @@ class TrackAdapter(private val context: Context, private var tracks: List<Track>
                 .load(track.artworkUrl100)
                 .placeholder(R.drawable.placeholder)
                 .transform(RoundedCorners(2))
-                .error(R.drawable.nastroi)
+                .error(R.drawable.placeholder)
                 .centerCrop()
                 .into(artworkImageView)
         }
