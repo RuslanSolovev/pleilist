@@ -43,12 +43,13 @@
 
         <EditText
             android:id="@+id/search_edit_text"
+            style="@style/background_poisk"
+            android:imeOptions="actionSearch"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:layout_gravity="center_vertical"
             android:layout_marginHorizontal="@dimen/otstup_big"
             android:layout_marginVertical="@dimen/otstup_8"
-            style="@style/background_poisk"
             android:drawableStart="@drawable/lupa2"
             android:drawablePadding="16dp"
             android:fontFamily="@font/ys_display_regular"
@@ -58,8 +59,8 @@
             android:paddingLeft="10dp"
             android:textColor="@color/chernii"
             android:textColorHint="@color/poisk_zvet"
-            app:boxCornerRadiusTopStart="@dimen/otstup_big"
-            android:textCursorDrawable="@drawable/cursor"/>
+            android:textCursorDrawable="@drawable/cursor"
+            app:boxCornerRadiusTopStart="@dimen/otstup_big" />
 
         <ImageButton
             android:id="@+id/clear_button"
@@ -73,7 +74,7 @@
             android:background="?attr/selectableItemBackground" />
     </FrameLayout>
 
-    <!-- Новый RecyclerView ниже поля поиска -->
+    <!-- RecyclerView для отображения треков -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
@@ -84,4 +85,52 @@
         android:paddingBottom="@dimen/otstup_8"
         android:scrollbars="vertical" />
 
+    <!-- Placeholder (заглушка) для пустых результатов или ошибок -->
+    <LinearLayout
+        android:id="@+id/placeholder_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_frame"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="@dimen/otstup_big">
+
+        <!-- Изображение заглушки -->
+        <ImageView
+            android:id="@+id/placeholder_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/light_mode"
+            android:contentDescription="@string/placeholder_description"
+            android:layout_marginTop="102dp"/>
+
+        <!-- Текст заглушки -->
+        <TextView
+            android:id="@+id/placeholder_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_results"
+            android:textSize="19sp"
+            style="@style/text_zagluhka"
+            android:textAlignment="center" />
+
+        <!-- Кнопка "Обновить" -->
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/obnovit"
+            android:visibility="gone"
+
+            style="@style/obnovit_rnopka"
+            android:padding="@dimen/otstup_8"
+
+            android:textSize="@dimen/otstup_srednii"
+            app:layout_constraintTop_toBottomOf="@id/placeholder_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </LinearLayout>
 </RelativeLayout>

@@ -1,113 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
-    style="@style/treki">
+    android:padding="8dp">
 
     <!-- Изображение обложки -->
     <ImageView
         android:id="@+id/artwork_image_view"
         android:layout_width="@dimen/ikonka_45"
         android:layout_height="@dimen/ikonka_45"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="@dimen/otstup_8"
-        android:layout_marginBottom="@dimen/otstup_8"
-        android:background="?attr/selectableItemBackground"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <!-- Название трека -->
+
+    <!-- Контейнер для имени исполнителя и времени трека -->
+
     <TextView
         android:id="@+id/track_name_text_view"
+        style="@style/nazvanie_pesni"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-
-        android:textSize="@dimen/otstup_big"
-
-        android:maxLines="1"
+        android:layout_height="@dimen/otstup_19"
+        android:layout_marginStart="@dimen/otstup_8"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="@dimen/otstup_44"
         android:ellipsize="end"
-
-        app:layout_constraintStart_toEndOf="@id/artwork_image_view"
-        app:layout_constraintTop_toTopOf="parent"
+        android:maxLines="1"
+        android:textSize="@dimen/otstup_big"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginRight="44dp"
-        android:layout_marginTop="@dimen/otstup_srednii"
-        android:layout_marginLeft="@dimen/otstup_8"
-        style="@style/treki"/>
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/artwork_image_view"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Контейнер для имени исполнителя, точки и времени трека -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/details_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/artwork_image_view"
         app:layout_constraintTop_toBottomOf="@id/track_name_text_view"
-        android:layout_marginBottom="@dimen/otstup_srednii"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginLeft="8dp">
-
-    <!-- Имя исполнителя (ширина 100dp) -->
-    <TextView
-        android:id="@+id/artist_name_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:textSize="@dimen/text_sixe3"
-        style="@style/treki"
-        android:maxLines="1"
-        android:ellipsize="end"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- Точка -->
-    <TextView
-        android:id="@+id/dot_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="•"
-        android:textSize="@dimen/text_sixe3"
-        style="@style/treki"
-        android:paddingStart="@dimen/otstup_mini"
-        android:paddingEnd="@dimen/otstup_mini"
-        app:layout_constraintStart_toEndOf="@id/artist_name_text_view"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- Время трека -->
-    <TextView
-        android:id="@+id/track_time_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        style="@style/treki"
-        android:textSize="@dimen/text_sixe3"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/dot_text_view"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="@dimen/otstup_8"
+        android:layout_marginEnd="@dimen/otstup_44"
+        android:layout_marginBottom="@dimen/otstup_srednii">
 
-    <!-- Иконка в правом углу -->
+        <!-- Имя исполнителя -->
+        <TextView
+            android:id="@+id/artist_name_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_sixe3"
+            style="@style/ispolnitel_vremy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Точка -->
+        <TextView
+            android:id="@+id/dot_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="•"
+            android:textSize="@dimen/text_sixe3"
+            style="@style/ispolnitel_vremy"
+            app:layout_constraintStart_toEndOf="@id/artist_name_text_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp" />
+
+        <!-- Время трека -->
+        <TextView
+            android:id="@+id/track_time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_sixe3"
+            style="@style/ispolnitel_vremy"
+            app:layout_constraintStart_toEndOf="@id/dot_text_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ImageView
-        android:id="@+id/icon_image_view"
+        android:id="@+id/icon_arrow"
         android:layout_width="@dimen/ikonka_24"
         android:layout_height="@dimen/ikonka_24"
         android:layout_marginEnd="12dp"
         android:layout_marginTop="18dp"
-        android:layout_marginBottom="19dp"
+        android:layout_marginBottom="@dimen/otstup_19"
         app:srcCompat="@drawable/strelkapesny"
-        style="@style/treki"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

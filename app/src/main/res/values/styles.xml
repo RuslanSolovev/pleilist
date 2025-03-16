@@ -69,4 +69,32 @@
         <item name="android:textColor">@color/chernii</item>
     </style>
 
+
+
+
+    <style name="obnovit_rnopka" parent="Widget.MaterialComponents.Button">
+        <item name="shapeAppearance">@style/obnovit_rnopka_shape</item>
+        <item name="backgroundTint">@color/chernii</item> <!-- Цвет фона -->
+        <item name="android:textColor">@color/white</item> <!-- Цвет текста -->
+    </style>
+
+    <style name="obnovit_rnopka_shape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">54dp</item> <!-- Закругление углов -->
+    </style>
+
+    <style name="text_zagluhka">
+        <item name="android:textColor">@color/chernii</item>
+    </style>
+
+    <style name="nazvanie_pesni">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ispolnitel_vremy">
+        <item name="android:textColor">@color/polzynok</item>
+    </style>
+
+
+
 </resources>
