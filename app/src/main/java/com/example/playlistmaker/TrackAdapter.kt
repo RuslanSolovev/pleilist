@@ -11,8 +11,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 
-class TrackAdapter(private val context: Context, private var tracks: List<Track>) :
-    RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(
+    private val context: Context,
+    private var tracks: List<Track>,
+    private val onItemClick: (Track) -> Unit // Лямбда для обработки кликов
+) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     // Метод для обновления списка треков
     fun updateTracks(newTracks: List<Track>) {
@@ -28,7 +31,18 @@ class TrackAdapter(private val context: Context, private var tracks: List<Track>
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         // Привязка данных к ViewHolder
-        holder.bind(tracks[position])
+        val track = tracks[position]
+        holder.bind(track)
+
+        // Установка обработчика кликов
+        holder.itemView.setOnClickListener {
+            // Подсветка элемента
+            it.isPressed = true
+            it.postDelayed({ it.isPressed = false }, 200) // Сбрасываем состояние через 200 мс
+
+            // Вызов колбэка
+            onItemClick(track)
+        }
     }
 
     override fun getItemCount(): Int = tracks.size

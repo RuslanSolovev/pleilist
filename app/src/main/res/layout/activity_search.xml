@@ -133,4 +133,46 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_frame"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/Text_Istoriy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вы искали"
+            android:gravity="center"
+            android:textSize="@dimen/otstup_19"
+            style="@style/text_zagluhka"
+            android:fontFamily="@font/ys_display_regular"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="18dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_Istory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/otstup_8"
+            android:paddingBottom="@dimen/otstup_8"
+            android:scrollbars="vertical" />
+
+        <Button
+            android:id="@+id/Ochistit_Istotiy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Очистить"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/ikonka_24"
+            style="@style/obnovit_rnopka">
+
+        </Button>
+
+    </LinearLayout>
+
 </RelativeLayout>

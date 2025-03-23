@@ -6,12 +6,12 @@ data class ItunesSearchResponse(
 )
 
 data class Track(
+    val trackId: Int,
     val trackName: String?,
     val artistName: String?,
     val trackTimeMillis: Long?,
     val artworkUrl100: String?
 ) {
-    // Форматирование времени трека в формат mm:ss
     val trackTime: String
         get() = if (trackTimeMillis != null) {
             val minutes = trackTimeMillis / 60000
