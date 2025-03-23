@@ -144,7 +144,7 @@
             android:id="@+id/Text_Istoriy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вы искали"
+            android:text="@string/vi_iskali"
             android:gravity="center"
             android:textSize="@dimen/otstup_19"
             style="@style/text_zagluhka"
@@ -166,7 +166,7 @@
             android:id="@+id/Ochistit_Istotiy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Очистить"
+            android:text="@string/ocistit"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/ikonka_24"
             style="@style/obnovit_rnopka">

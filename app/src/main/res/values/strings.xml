@@ -20,6 +20,8 @@
     <string name="no_results">Ничего не нашлось</string>
     <string name="placeholder_description">вот</string>
     <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="vi_iskali">Вы искали</string>
+    <string name="ocistit">Очистить</string>
 
 </resources>
 
