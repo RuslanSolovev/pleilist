@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -64,16 +64,14 @@ class SearchActivity : AppCompatActivity() {
         // Настройка RecyclerView для результатов поиска
         recyclerView.layoutManager = LinearLayoutManager(this)
         trackAdapter = TrackAdapter(this, emptyList()) { track ->
-            searchHistory.addToHistory(track) // Добавляем трек в историю
-            Toast.makeText(this, "Трек \"${track.trackName}\" добавлен в историю", Toast.LENGTH_SHORT).show()
+            handleTrackClick(track) // Обрабатываем клик на трек из результатов поиска
         }
         recyclerView.adapter = trackAdapter
 
         // Настройка RecyclerView для истории
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyAdapter = TrackAdapter(this, searchHistory.getHistory()) { track ->
-            val query = track.trackName ?: ""
-            performSearch(query)
+            handleTrackClick(track) // Обрабатываем клик на трек из истории
         }
         historyRecyclerView.adapter = historyAdapter
 
@@ -255,7 +253,7 @@ class SearchActivity : AppCompatActivity() {
             clearHistoryButton.visibility = View.VISIBLE
             historyAdapter.updateTracks(history)
         } else {
-            hideHistory() // Скрываем историю, если она пуста
+            hideHistory()
         }
     }
 
@@ -264,6 +262,37 @@ class SearchActivity : AppCompatActivity() {
         historyHeader.visibility = View.GONE
         historyRecyclerView.visibility = View.GONE
         clearHistoryButton.visibility = View.GONE
+    }
+
+    // Обработка клика на трек
+    private fun handleTrackClick(track: Track) {
+        // Получаем текущую историю
+        val history = searchHistory.getHistory().toMutableList()
+
+        // Проверяем, есть ли трек в истории
+        val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
+
+        if (existingIndex != -1) {
+            // Если трек уже есть в истории, перемещаем его на первое место
+            history.removeAt(existingIndex)
+        }
+
+        // Добавляем трек в начало истории
+        history.add(0, track)
+
+        // Если история превышает 10 элементов, удаляем последний
+        if (history.size > 10) {
+            history.removeAt(history.size - 1)
+        }
+
+        // Сохраняем обновленную историю
+        searchHistory.saveHistory(history)
+
+        // Обновляем адаптер истории
+        historyAdapter.updateTracks(history)
+
+        // Воспроизводим трек (пока просто показываем Toast)
+        Toast.makeText(this, "Добавлен в историю: ${track.trackName}", Toast.LENGTH_SHORT).show()
     }
 
     // Создание Retrofit сервиса

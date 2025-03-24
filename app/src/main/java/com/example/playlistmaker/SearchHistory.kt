@@ -6,40 +6,34 @@ import com.google.gson.reflect.TypeToken
 
 class SearchHistory(private val sharedPreferences: SharedPreferences) {
 
-    private val gson = Gson()
-    private val historyKey = "SEARCH_HISTORY"
+    companion object {
+        private const val SEARCH_HISTORY_KEY = "search_history"
+        private const val MAX_HISTORY_SIZE = 10 // Максимальное количество треков в истории
+    }
 
-    // Получение истории из SharedPreferences
+    // Получить историю поиска
     fun getHistory(): List<Track> {
-        val json = sharedPreferences.getString(historyKey, null)
-        return if (json != null) {
-            gson.fromJson(json, object : TypeToken<List<Track>>() {}.type)
+        val historyJson = sharedPreferences.getString(SEARCH_HISTORY_KEY, null)
+        return if (historyJson != null) {
+            Gson().fromJson(historyJson, object : TypeToken<List<Track>>() {}.type)
         } else {
             emptyList()
         }
     }
 
-    // Добавление трека в историю
-    fun addToHistory(track: Track) {
-        val currentHistory = getHistory().toMutableList()
-
-
-
-        // Удаляем трек, если он уже есть в истории
-        currentHistory.removeAll { it.trackId == track.trackId }
-        // Добавляем трек в начало списка
-        currentHistory.add(0, track)
-        // Ограничиваем размер истории до 10 элементов
-        if (currentHistory.size > 10) {
-            currentHistory.removeLast()
+    // Сохранить историю поиска
+    fun saveHistory(history: List<Track>) {
+        val updatedHistory = if (history.size > MAX_HISTORY_SIZE) {
+            history.take(MAX_HISTORY_SIZE) // Оставляем только последние 10 треков
+        } else {
+            history
         }
-        // Сохраняем обновленную историю
-        val updatedJson = gson.toJson(currentHistory)
-        sharedPreferences.edit().putString(historyKey, updatedJson).apply()
+        val historyJson = Gson().toJson(updatedHistory)
+        sharedPreferences.edit().putString(SEARCH_HISTORY_KEY, historyJson).apply()
     }
 
-    // Очистка истории
+    // Очистить историю поиска
     fun clearHistory() {
-        sharedPreferences.edit().remove(historyKey).apply()
+        sharedPreferences.edit().remove(SEARCH_HISTORY_KEY).apply()
     }
 }
