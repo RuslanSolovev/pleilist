@@ -1,10 +1,12 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -25,6 +27,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+
 
 class SearchActivity : AppCompatActivity() {
 
@@ -293,7 +296,28 @@ class SearchActivity : AppCompatActivity() {
 
         // Воспроизводим трек (пока просто показываем Toast)
         Toast.makeText(this, "Добавлен в историю: ${track.trackName}", Toast.LENGTH_SHORT).show()
+
+        Log.d("TrackData", "Preparing to send data via Intent:")
+        Log.d("TrackData", "Track Name: ${track.trackName}")
+        Log.d("TrackData", "Artist Name: ${track.artistName}")
+        Log.d("TrackData", "Track Time: ${track.trackTimeMillis}")
+        Log.d("TrackData", "Country: ${track.country}")
+
+        val intent = Intent(this, MediaActivity::class.java).apply {
+            // Передаем данные о треке через Intent
+            putExtra("TRACK_ID", track.trackId)
+            putExtra("TRACK_NAME", track.trackName)
+            putExtra("ARTIST_NAME", track.artistName)
+            putExtra("ARTWORK_URL", track.artworkUrl100)
+            putExtra("COLLECTION_NAME", track.collectionName)
+            putExtra("RELEASE_DATE", track.releaseDate)
+            putExtra("PRIMARY_GENRE", track.primaryGenreName)
+            putExtra("COUNTRY", track.country)
+            putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+        }
+        startActivity(intent)
     }
+
 
     // Создание Retrofit сервиса
     private fun createItunesApiService(): ItunesApiService {
@@ -329,8 +353,13 @@ class SearchActivity : AppCompatActivity() {
 
 // Интерфейс для работы с iTunes API
 interface ItunesApiService {
-    @GET("/search?entity=song")
-    suspend fun search(@Query("term") text: String): Response<ItunesSearchResponse>
+    @GET("search")
+    suspend fun search(
+        @Query("term") term: String,         // Поисковый запрос (например, название трека)
+        @Query("entity") entity: String = "song", // Тип контента (по умолчанию "song")
+        @Query("country") country: String = "US", // Страна для поиска (по умолчанию "US")
+        @Query("limit") limit: Int = 10     // Лимит результатов (по умолчанию 10)
+    ): Response<ItunesSearchResponse>
 }
 
 // Перечисление типов заглушек

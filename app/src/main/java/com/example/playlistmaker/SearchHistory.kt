@@ -1,39 +1,60 @@
 package com.example.playlistmaker
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class SearchHistory(private val sharedPreferences: SharedPreferences) {
 
-    companion object {
-        private const val SEARCH_HISTORY_KEY = "search_history"
-        private const val MAX_HISTORY_SIZE = 10 // Максимальное количество треков в истории
+    private val historyKey = "search_history"
+    private val likesKey = "track_likes"
+    private val gson = Gson()
+
+    // Сохранение истории поиска
+    fun saveHistory(tracks: List<Track>) {
+        val trackJson = gson.toJson(tracks) // Преобразуем список треков в JSON
+        sharedPreferences.edit().putString(historyKey, trackJson).apply()
     }
 
-    // Получить историю поиска
+    // Получение истории поиска
     fun getHistory(): List<Track> {
-        val historyJson = sharedPreferences.getString(SEARCH_HISTORY_KEY, null)
-        return if (historyJson != null) {
-            Gson().fromJson(historyJson, object : TypeToken<List<Track>>() {}.type)
-        } else {
+        val historyJson = sharedPreferences.getString(historyKey, null) ?: return emptyList()
+        return try {
+            gson.fromJson(historyJson, object : TypeToken<List<Track>>() {}.type)
+        } catch (e: Exception) {
             emptyList()
         }
     }
 
-    // Сохранить историю поиска
-    fun saveHistory(history: List<Track>) {
-        val updatedHistory = if (history.size > MAX_HISTORY_SIZE) {
-            history.take(MAX_HISTORY_SIZE) // Оставляем только последние 10 треков
-        } else {
-            history
-        }
-        val historyJson = Gson().toJson(updatedHistory)
-        sharedPreferences.edit().putString(SEARCH_HISTORY_KEY, historyJson).apply()
+    // Очистка истории
+    fun clearHistory() {
+        sharedPreferences.edit().remove(historyKey).apply()
     }
 
-    // Очистить историю поиска
-    fun clearHistory() {
-        sharedPreferences.edit().remove(SEARCH_HISTORY_KEY).apply()
+    // Сохранение состояния лайка для трека
+    fun saveLike(trackId: Int, isLiked: Boolean) {
+        val likesMap = getLikesMap().toMutableMap()
+        if (isLiked) {
+            likesMap[trackId] = true
+        } else {
+            likesMap.remove(trackId)
+        }
+        sharedPreferences.edit().putString(likesKey, gson.toJson(likesMap)).apply()
+    }
+
+    // Получение состояния лайка для трека
+    fun isTrackLiked(trackId: Int): Boolean {
+        return getLikesMap()[trackId] == true
+    }
+
+    // Получение всех лайков
+    private fun getLikesMap(): Map<Int, Boolean> {
+        val likesString = sharedPreferences.getString(likesKey, null) ?: return emptyMap()
+        return try {
+            gson.fromJson(likesString, object : TypeToken<Map<Int, Boolean>>() {}.type)
+        } catch (e: Exception) {
+            emptyMap()
+        }
     }
 }
