@@ -130,7 +130,7 @@
                 android:id="@+id/albom"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/shirina"
-                android:text="@string/dlit"
+                android:text="@string/albom"
                 android:textSize="@dimen/text_13"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="16dp"
