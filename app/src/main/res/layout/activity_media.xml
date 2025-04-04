@@ -101,7 +101,7 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/otstup_big"
             android:gravity="center"
-            android:text="0:30"
+            android:text="0:40"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/imageView"
             app:layout_constraintHorizontal_bias="0.0"
