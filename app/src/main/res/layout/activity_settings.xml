@@ -29,7 +29,7 @@
             android:background="?attr/selectableItemBackground"/>
 
         <TextView
-
+            style="@style/zagolovok"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -51,14 +51,13 @@
             />
 
         <Switch
-            style="@style/dly_polzynka"
             android:id="@+id/theme_switch"
+            style="@style/dly_polzynka"
             android:layout_width="56dp"
             android:layout_height="@dimen/knopka_naz"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="11dp"
             android:layout_marginTop="10dp"
-            />
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="11dp" />
 
     </LinearLayout>
 
