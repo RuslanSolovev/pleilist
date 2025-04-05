@@ -16,18 +16,5 @@
     <string name="soobchenie_razrab">"Сообщение разработчикам и разработчицам приложения Playlist Maker"</string>
     <string name="spasibo_razrab">"Спасибо разработчикам и разработчицам за крутое приложение!"</string>
     <string name="net_pozta">"Не удалось открыть почтовый клиент"</string>
-    <string name="obnovit">Oбновить</string>
-    <string name="no_results">Ничего не нашлось</string>
-    <string name="placeholder_description">вот</string>
-    <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
-    <string name="vi_iskali">Вы искали</string>
-    <string name="ocistit">Очистить</string>
-
-    <string name="dlit">Длительность</string>
-    <string name="akbom">Альбом</string>
-    <string name="god">Год</string>
-    <string name="janr">Жанр</string>
-    <string name="ctrana">Страна</string>
-
 </resources>
 
