@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <dimen name="tekst_size">22sp</dimen>
     <dimen name="tekst_size2">16sp</dimen>
     <dimen name="otstup_mini">4dp</dimen>
@@ -15,8 +14,4 @@
     <dimen name="ikonka_24">24dp</dimen>
     <dimen name="otstup_44">44dp</dimen>
     <dimen name="otstup_19">19dp</dimen>
-    <dimen name="big_oblojka">312dp</dimen>
-    <dimen name="shirina">32dp</dimen>
-    <dimen name="text_13">13sp</dimen>
-
 </resources>
