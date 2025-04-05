@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Цвет фона -->
+    <solid android:color="@color/light_gray" />
+
+    <!-- Закругление углов -->
+    <corners android:radius="8dp" /> <!-- Радиус углов -->
+
+
+
+</shape>

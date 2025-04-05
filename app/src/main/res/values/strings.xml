@@ -1,3 +1,33 @@
 <resources>
-    <string name="app_name">Playlist Maker</string>
+    <string name="app_name">Playlist maker</string>
+    <string name="button_poisk">Поиск</string>
+    <string name="button_musika">Медиатека</string>
+    <string name="button_nastroi">Настройки</string>
+    <string name="temno_tema">Темная тема</string>
+    <string name="podelitsy">Поделиться приложением</string>
+    <string name="poddergka">Написать в поддержку</string>
+    <string name="soglahenie">Пользовательское соглашение</string>
+    <string name="nazad">Вернуться назад</string>
+    <string name="haring">"Проверь этот отличный курс по Android-разработке в Практикуме! https://practicum.yandex.ru/android-developer/"</string>
+    <string name="podel_cherez">Поделиться через</string>
+    <string name="poisk">Поиск</string>
+    <string name="net_haring">"Не удалось открыть меню шаринга"</string>
+    <string name="net_brauzer">"Не удалось открыть браузер"</string>
+    <string name="soobchenie_razrab">"Сообщение разработчикам и разработчицам приложения Playlist Maker"</string>
+    <string name="spasibo_razrab">"Спасибо разработчикам и разработчицам за крутое приложение!"</string>
+    <string name="net_pozta">"Не удалось открыть почтовый клиент"</string>
+    <string name="obnovit">Oбновить</string>
+    <string name="no_results">Ничего не нашлось</string>
+    <string name="placeholder_description">вот</string>
+    <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="vi_iskali">Вы искали</string>
+    <string name="ocistit">Очистить</string>
+
+    <string name="dlit">Длительность</string>
+    <string name="albom">Альбом</string>
+    <string name="god">Год</string>
+    <string name="janr">Жанр</string>
+    <string name="strana">Страна</string>
+
 </resources>
+
