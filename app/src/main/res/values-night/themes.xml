@@ -41,45 +41,7 @@
     <item name="android:trackTint">@color/polzynok4</item>
 </style>
 
-    <style name="treki">
-        <item name="android:textColor">@color/white</item>
-        <item name="tint">@color/white</item>
-    </style>
-
-    <style name="background_poisk">
-        <item name="android:background">@drawable/bakgr</item>
-    </style>
-
-    <style name="background_fon">
-        <item name="android:background">@color/chernii</item>
-    </style>
-
-    <style name="zagolovok">
-    <item name="android:textColor">@color/white</item>
-</style>
 
 
-    <style name="obnovit_rnopka" parent="Widget.MaterialComponents.Button">
-        <item name="shapeAppearance">@style/obnovit_rnopka_shape</item>
-        <item name="backgroundTint">@color/white</item> <!-- Цвет фона -->
-        <item name="android:textColor">@color/chernii</item> <!-- Цвет текста -->
-    </style>
-
-    <style name="obnovit_rnopka_shape">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">54dp</item> <!-- Закругление углов -->
-    </style>
-
-    <style name="text_zagluhka">
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="ispolnitel_vremy">
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="nazvanie_pesni">
-        <item name="android:textColor">@color/white</item>
-    </style>
 
 </resources>
