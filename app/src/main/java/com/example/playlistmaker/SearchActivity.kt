@@ -1,10 +1,12 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -37,10 +39,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var historyHeader: TextView
     private lateinit var clearHistoryButton: View
-
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var searchHistory: SearchHistory
-
     private var searchQuery: String? = null
     private val itunesApiService by lazy { createItunesApiService() }
 
@@ -184,22 +184,24 @@ class SearchActivity : AppCompatActivity() {
 
     // Метод для выполнения поискового запроса
     private fun performSearch(query: String) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = itunesApiService.search(query)
                 if (response.isSuccessful && response.body() != null) {
                     val tracks = response.body()!!.results
                     if (tracks.isEmpty()) {
-                        showPlaceholder(PlaceholderType.NO_RESULTS)
+                        runOnUiThread { showPlaceholder(PlaceholderType.NO_RESULTS) }
                     } else {
-                        trackAdapter.updateTracks(tracks)
-                        showContent()
+                        runOnUiThread {
+                            trackAdapter.updateTracks(tracks)
+                            showContent()
+                        }
                     }
                 } else {
-                    showPlaceholder(PlaceholderType.ERROR)
+                    runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
                 }
             } catch (e: Exception) {
-                showPlaceholder(PlaceholderType.ERROR)
+                runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
             }
         }
     }
@@ -224,7 +226,6 @@ class SearchActivity : AppCompatActivity() {
         val placeholderImage = findViewById<ImageView>(R.id.placeholder_image)
         val placeholderText = findViewById<TextView>(R.id.placeholder_text)
         val retryButton = findViewById<View>(R.id.retry_button)
-
         when (type) {
             PlaceholderType.NO_RESULTS -> {
                 placeholderImage.setImageResource(R.drawable.light_mode)
@@ -271,7 +272,6 @@ class SearchActivity : AppCompatActivity() {
 
         // Проверяем, есть ли трек в истории
         val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
-
         if (existingIndex != -1) {
             // Если трек уже есть в истории, перемещаем его на первое место
             history.removeAt(existingIndex)
@@ -291,8 +291,19 @@ class SearchActivity : AppCompatActivity() {
         // Обновляем адаптер истории
         historyAdapter.updateTracks(history)
 
-        // Воспроизводим трек (пока просто показываем Toast)
-        Toast.makeText(this, "Добавлен в историю: ${track.trackName}", Toast.LENGTH_SHORT).show()
+        // Переход к экрану MediaActivity
+        val intent = Intent(this, MediaActivity::class.java).apply {
+            putExtra("TRACK_ID", track.trackId)
+            putExtra("TRACK_NAME", track.trackName)
+            putExtra("ARTIST_NAME", track.artistName)
+            putExtra("ARTWORK_URL", track.artworkUrl100)
+            putExtra("COLLECTION_NAME", track.collectionName)
+            putExtra("RELEASE_DATE", track.releaseDate)
+            putExtra("PRIMARY_GENRE", track.primaryGenreName)
+            putExtra("COUNTRY", track.country)
+            putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+        }
+        startActivity(intent)
     }
 
     // Создание Retrofit сервиса
@@ -329,8 +340,13 @@ class SearchActivity : AppCompatActivity() {
 
 // Интерфейс для работы с iTunes API
 interface ItunesApiService {
-    @GET("/search?entity=song")
-    suspend fun search(@Query("term") text: String): Response<ItunesSearchResponse>
+    @GET("search")
+    suspend fun search(
+        @Query("term") term: String,         // Поисковый запрос (например, название трека)
+        @Query("entity") entity: String = "song", // Тип контента (по умолчанию "song")
+        @Query("country") country: String = "US", // Страна для поиска (по умолчанию "US")
+        @Query("limit") limit: Int = 10     // Лимит результатов (по умолчанию 10)
+    ): Response<ItunesSearchResponse>
 }
 
 // Перечисление типов заглушек

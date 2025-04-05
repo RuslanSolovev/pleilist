@@ -1,14 +1,251 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:padding="@dimen/otstup_big">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-<TextView
-    android:id="@+id/textView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Это экран медиа"
-    android:textSize="30dp"
-    android:layout_centerInParent="true"/>
-</RelativeLayout>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Кнопка "Назад" -->
+    <ImageButton
+        android:id="@+id/back_button3"
+        style="@style/Theme.strelka_nazad"
+        android:layout_width="@dimen/knopka_naz"
+        android:layout_height="@dimen/knopka_naz"
+        android:contentDescription="@string/nazad"
+        android:src="@drawable/strelka"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp" />
+
+    <!-- Центральное изображение -->
+
+    <!-- Название песни -->
+    <ImageView
+        android:id="@+id/pleer_image_view"
+        android:layout_width="@dimen/otstup_312"
+        android:layout_height="@dimen/otstup_312"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.525"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_button3" />
+
+    <!-- Название группы -->
+
+    <!-- Изображения -->
+
+    <TextView
+        android:id="@+id/pesny_nazvanie"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/otstup_26"
+        android:layout_marginTop = "@dimen/otstup_26"
+        android:gravity="start"
+        android:textColor="@color/chernii"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="@+id/pleer_image_view"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/pleer_image_view"
+        app:layout_constraintTop_toBottomOf="@id/pleer_image_view" />
+
+    <TextView
+        android:id="@+id/nazvanie_gruppa"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/otstup_big"
+        android:layout_marginTop="12dp"
+        android:gravity="start"
+        android:textColor="@color/chernii"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/pleer_image_view"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/pleer_image_view"
+        app:layout_constraintTop_toBottomOf="@id/pesny_nazvanie" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nazvanie_gruppa"
+        app:srcCompat="@drawable/button" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/button__2_"
+        app:layout_constraintStart_toStartOf="@id/pleer_image_view"
+        app:layout_constraintTop_toBottomOf="@+id/nazvanie_gruppa"
+        android:layout_marginTop="54dp" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/button__3_"
+        app:layout_constraintEnd_toEndOf="@id/pleer_image_view"
+        app:layout_constraintTop_toBottomOf="@+id/nazvanie_gruppa"
+        android:layout_marginTop="54dp" />
+
+    <!-- Ползунок времени -->
+
+
+
+
+    <TextView
+        android:id="@+id/otzet_vremy"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/otstup_big"
+        android:gravity="center"
+        android:text="30"
+        style="@style/zagolovok"
+
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/imageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/imageView"
+        app:layout_constraintTop_toBottomOf="@id/imageView" />
+
+    <TextView
+                android:id="@+id/dlitelnost"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/otstup_32"
+                android:text="Длительность"
+                android:textSize="13sp"
+                android:layout_marginStart="@dimen/otstup_big"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/otzet_vremy" />
+
+            <TextView
+                android:id="@+id/albom"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                android:text="Альбом"
+                android:gravity="start"
+                android:layout_marginStart="@dimen/otstup_big"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dlitelnost"
+                app:layout_constraintEnd_toStartOf="@+id/barrier" />
+
+            <TextView
+                android:id="@+id/god"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                android:text="Год"
+                app:layout_constraintEnd_toStartOf="@+id/barrier"
+                android:layout_marginStart="@dimen/otstup_big"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/albom" />
+
+            <TextView
+                android:id="@+id/janr"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                android:text="Жанр"
+                app:layout_constraintEnd_toStartOf="@+id/barrier"
+                android:layout_marginStart="@dimen/otstup_big"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/god" />
+
+            <TextView
+                android:id="@+id/strana"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                android:text="Страна"
+                android:textSize="13sp"
+                android:layout_marginStart="@dimen/otstup_big"
+                app:layout_constraintEnd_toStartOf="@+id/barrier"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/janr" />
+
+            <!-- Барьер -->
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="end"
+                app:constraint_referenced_ids="dlitelnost,albom,god,janr,strana" />
+
+            <!-- Правые TextView -->
+            <TextView
+                android:id="@+id/dlitelnost2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+
+                style="@style/zagolovok"
+                android:layout_marginEnd="@dimen/otstup_big"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/barrier"
+                app:layout_constraintTop_toTopOf="@id/dlitelnost"
+                android:gravity="end" />
+
+            <TextView
+                android:id="@+id/albom2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                android:layout_marginEnd="@dimen/otstup_big"
+                android:textSize="13sp"
+                style="@style/zagolovok"
+
+                app:layout_constraintStart_toEndOf="@id/barrier"
+                app:layout_constraintTop_toTopOf="@id/albom"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="end" />
+
+            <TextView
+                android:id="@+id/god2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                style="@style/zagolovok"
+
+                android:textSize="13sp"
+                android:layout_marginEnd="@dimen/otstup_big"
+                app:layout_constraintStart_toEndOf="@id/barrier"
+                app:layout_constraintTop_toTopOf="@id/god"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="end" />
+
+            <TextView
+                android:id="@+id/janr2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+
+                android:textSize="13sp"
+                style="@style/zagolovok"
+                android:layout_marginEnd="@dimen/otstup_big"
+                app:layout_constraintStart_toEndOf="@id/barrier"
+                app:layout_constraintTop_toTopOf="@id/janr"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="end" />
+
+            <TextView
+                android:id="@+id/strana2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/otstup_32"
+                style="@style/zagolovok"
+
+                android:layout_marginEnd="@dimen/otstup_big"
+                android:textSize="13sp"
+                app:layout_constraintStart_toEndOf="@id/barrier"
+                app:layout_constraintTop_toTopOf="@id/strana"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="end" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</ScrollView>
