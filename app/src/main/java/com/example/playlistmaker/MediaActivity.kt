@@ -104,7 +104,7 @@ class MediaActivity : AppCompatActivity() {
         countryInfo.text = country ?: "Неизвестна"
         durationTextView.text = trackTimeFormatted
 
-        // Загружаем изображение обложки с помощью Glide
+        // Загружаем изображение обложки с помощью Glide.
         if (!artworkUrl.isNullOrEmpty()) {
             Glide.with(this)
                 .load(artworkUrl)

@@ -31,7 +31,7 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
         sharedPreferences.edit().remove(historyKey).apply()
     }
 
-    // Сохранение состояния лайка для трека
+    // Сохранение состояния лайка для трека.
     fun saveLike(trackId: Int, isLiked: Boolean) {
         val likesMap = getLikesMap().toMutableMap()
         if (isLiked) {

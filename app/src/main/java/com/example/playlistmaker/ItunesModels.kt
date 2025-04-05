@@ -26,7 +26,7 @@ data class Track(
             "--:--"
         }
 
-    // Функция для получения ссылки на обложку высокого качества
+    // Функция для получения ссылки на обложку высокого качества.
     fun getCoverArtwork(): String? {
         return artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
     }

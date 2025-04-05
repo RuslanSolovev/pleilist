@@ -37,9 +37,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/back_button3" />
 
-    <!-- Название группы -->
+    <!-- Название группы. -->
 
-    <!-- Изображения -->
+    <!-- Изображения .-->
 
     <TextView
         android:id="@+id/pesny_nazvanie"

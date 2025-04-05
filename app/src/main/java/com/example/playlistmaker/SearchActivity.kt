@@ -280,15 +280,15 @@ class SearchActivity : AppCompatActivity() {
         // Добавляем трек в начало истории
         history.add(0, track)
 
-        // Если история превышает 10 элементов, удаляем последний
+        // Если история превышает 10 элементов, удаляем последний.
         if (history.size > 10) {
             history.removeAt(history.size - 1)
         }
 
-        // Сохраняем обновленную историю
+        // Сохраняем обновленную историю.
         searchHistory.saveHistory(history)
 
-        // Обновляем адаптер истории
+        // Обновляем адаптер истории.
         historyAdapter.updateTracks(history)
 
         // Переход к экрану MediaActivity
