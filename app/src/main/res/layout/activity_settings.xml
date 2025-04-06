@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/setting"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/Theme.Nastrjiki"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/otstup_mini"
+        android:layout_marginStart="@dimen/otstup_mini"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        >
+
+        <ImageButton
+            android:id="@+id/back_button"
+            style="@style/Theme.strelka_nazad"
+            android:layout_width="@dimen/knopka_naz"
+            android:layout_height="@dimen/knopka_naz"
+
+            android:contentDescription="@string/nazad"
+            android:src="@drawable/strelka"
+            android:background="?attr/selectableItemBackground"/>
+
+        <TextView
+            style="@style/zagolovok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/iconka_otstup"
+            android:text="@string/button_nastroi"
+            android:textSize="@dimen/tekst_size"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/linarLayot_nastroiki"
+        >
+
+        <TextView
+            style="@style/knopki_nastroiki"
+            android:text="@string/temno_tema"
+            />
+
+        <Switch
+            android:id="@+id/theme_switch"
+            style="@style/dly_polzynka"
+            android:layout_width="56dp"
+            android:layout_height="@dimen/knopka_naz"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="11dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/share_button"
+        style="@style/linarLayot_nastroiki"
+        >
+
+        <TextView
+            style="@style/knopki_nastroiki"
+            android:text="@string/podelitsy"
+            />
+
+        <ImageView
+
+            style="@style/ikonki_nastroiki"
+            app:srcCompat="@drawable/podelitsy"
+
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/linarLayot_nastroiki"
+        android:id="@+id/support_button">
+        <TextView
+            style="@style/knopki_nastroiki"
+            android:text="@string/poddergka"
+            />
+
+        <ImageView
+
+            style="@style/ikonki_nastroiki"
+            app:srcCompat="@drawable/podderg" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/terms_button"
+        style="@style/linarLayot_nastroiki">
+
+        <TextView
+            style="@style/knopki_nastroiki"
+            android:text="@string/soglahenie"
+             />
+
+        <ImageView
+
+            style="@style/ikonki_nastroiki"
+            app:srcCompat="@drawable/soglah"
+             />
+    </LinearLayout>
+
+</LinearLayout>

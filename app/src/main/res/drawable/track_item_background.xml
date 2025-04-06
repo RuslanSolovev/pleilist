@@ -1,0 +1,16 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Состояние при нажатии -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#E0E0E0" /> <!-- Цвет фона при нажатии -->
+            <stroke android:width="2dp" android:color="#6200EE" /> <!-- Рамка -->
+            <corners android:radius="8dp" /> <!-- Закругленные углы -->
+        </shape>
+    </item>
+    <!-- Состояние по умолчанию -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" /> <!-- Прозрачный фон -->
+        </shape>
+    </item>
+</selector>
