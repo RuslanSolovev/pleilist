@@ -14,4 +14,9 @@
     <dimen name="ikonka_24">24dp</dimen>
     <dimen name="otstup_44">44dp</dimen>
     <dimen name="otstup_19">19dp</dimen>
+
+    <dimen name="otstup_312">312dp</dimen>
+    <dimen name="otstup_26">26dp</dimen>
+    <dimen name="otstup_32">32dp</dimen>
+
 </resources>

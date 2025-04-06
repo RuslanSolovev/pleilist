@@ -23,5 +23,11 @@
     <string name="vi_iskali">Вы искали</string>
     <string name="ocistit">Очистить</string>
 
+    <string name="dlit">Длительность</string>
+    <string name="albom">Альбом</string>
+    <string name="god">Год</string>
+    <string name="janr">Жанр</string>
+    <string name="strana">Страна</string>
+
 </resources>
 
