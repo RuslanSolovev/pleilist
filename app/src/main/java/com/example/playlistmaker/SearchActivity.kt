@@ -28,7 +28,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
@@ -40,10 +39,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var historyHeader: TextView
     private lateinit var clearHistoryButton: View
-
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var searchHistory: SearchHistory
-
     private var searchQuery: String? = null
     private val itunesApiService by lazy { createItunesApiService() }
 
@@ -187,22 +184,24 @@ class SearchActivity : AppCompatActivity() {
 
     // Метод для выполнения поискового запроса
     private fun performSearch(query: String) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = itunesApiService.search(query)
                 if (response.isSuccessful && response.body() != null) {
                     val tracks = response.body()!!.results
                     if (tracks.isEmpty()) {
-                        showPlaceholder(PlaceholderType.NO_RESULTS)
+                        runOnUiThread { showPlaceholder(PlaceholderType.NO_RESULTS) }
                     } else {
-                        trackAdapter.updateTracks(tracks)
-                        showContent()
+                        runOnUiThread {
+                            trackAdapter.updateTracks(tracks)
+                            showContent()
+                        }
                     }
                 } else {
-                    showPlaceholder(PlaceholderType.ERROR)
+                    runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
                 }
             } catch (e: Exception) {
-                showPlaceholder(PlaceholderType.ERROR)
+                runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
             }
         }
     }
@@ -227,7 +226,6 @@ class SearchActivity : AppCompatActivity() {
         val placeholderImage = findViewById<ImageView>(R.id.placeholder_image)
         val placeholderText = findViewById<TextView>(R.id.placeholder_text)
         val retryButton = findViewById<View>(R.id.retry_button)
-
         when (type) {
             PlaceholderType.NO_RESULTS -> {
                 placeholderImage.setImageResource(R.drawable.light_mode)
@@ -274,7 +272,6 @@ class SearchActivity : AppCompatActivity() {
 
         // Проверяем, есть ли трек в истории
         val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
-
         if (existingIndex != -1) {
             // Если трек уже есть в истории, перемещаем его на первое место
             history.removeAt(existingIndex)
@@ -283,28 +280,19 @@ class SearchActivity : AppCompatActivity() {
         // Добавляем трек в начало истории
         history.add(0, track)
 
-        // Если история превышает 10 элементов, удаляем последний
+        // Если история превышает 10 элементов, удаляем последний.
         if (history.size > 10) {
             history.removeAt(history.size - 1)
         }
 
-        // Сохраняем обновленную историю
+        // Сохраняем обновленную историю.
         searchHistory.saveHistory(history)
 
-        // Обновляем адаптер истории
+        // Обновляем адаптер истории.
         historyAdapter.updateTracks(history)
 
-        // Воспроизводим трек (пока просто показываем Toast)
-        Toast.makeText(this, "Добавлен в историю: ${track.trackName}", Toast.LENGTH_SHORT).show()
-
-        Log.d("TrackData", "Preparing to send data via Intent:")
-        Log.d("TrackData", "Track Name: ${track.trackName}")
-        Log.d("TrackData", "Artist Name: ${track.artistName}")
-        Log.d("TrackData", "Track Time: ${track.trackTimeMillis}")
-        Log.d("TrackData", "Country: ${track.country}")
-
+        // Переход к экрану MediaActivity
         val intent = Intent(this, MediaActivity::class.java).apply {
-            // Передаем данные о треке через Intent
             putExtra("TRACK_ID", track.trackId)
             putExtra("TRACK_NAME", track.trackName)
             putExtra("ARTIST_NAME", track.artistName)
@@ -317,7 +305,6 @@ class SearchActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
 
     // Создание Retrofit сервиса
     private fun createItunesApiService(): ItunesApiService {

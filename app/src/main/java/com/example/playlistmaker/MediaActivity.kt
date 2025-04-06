@@ -34,6 +34,7 @@ class MediaActivity : AppCompatActivity() {
             finish() // Закрыть активити и вернуться назад
         }
 
+
         // Извлекаем данные из Intent
         val trackId = intent.getIntExtra("TRACK_ID", 0)
         val trackName = intent.getStringExtra("TRACK_NAME")
@@ -103,7 +104,7 @@ class MediaActivity : AppCompatActivity() {
         countryInfo.text = country ?: "Неизвестна"
         durationTextView.text = trackTimeFormatted
 
-        // Загружаем изображение обложки с помощью Glide
+        // Загружаем изображение обложки с помощью Glide.
         if (!artworkUrl.isNullOrEmpty()) {
             Glide.with(this)
                 .load(artworkUrl)
