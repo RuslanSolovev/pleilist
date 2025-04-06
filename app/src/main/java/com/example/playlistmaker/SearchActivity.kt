@@ -327,7 +327,7 @@ class SearchActivity : AppCompatActivity() {
     }
 }
 
-// Интерфейс для работы с iTunes API
+// Интерфейс для работы с iTunes API.
 interface ItunesApiService {
     @GET("/search?entity=song")
     suspend fun search(@Query("term") text: String): Response<ItunesSearchResponse>
