@@ -11,8 +11,11 @@ import androidx.appcompat.app.AppCompatDelegate
 
 class MainActivity : AppCompatActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Загрузка сохраненной темы
+
+    
         loadTheme()
 
         super.onCreate(savedInstanceState)
