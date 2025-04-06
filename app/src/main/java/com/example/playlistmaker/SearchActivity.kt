@@ -310,7 +310,7 @@ class SearchActivity : AppCompatActivity() {
         outState.putString("SEARCH_QUERY", searchQuery)
     }
 
-    // Восстановление состояния
+    // Восстановление состояния.
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchQuery = savedInstanceState.getString("SEARCH_QUERY")
