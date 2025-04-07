@@ -13,6 +13,10 @@
         android:layout_width="@dimen/ikonka_45"
         android:layout_height="@dimen/ikonka_45"
         android:scaleType="centerCrop"
+        android:layout_marginTop="@dimen/otstup_8"
+        android:layout_marginBottom="@dimen/otstup_8"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="@dimen/otstup_8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -27,7 +31,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/otstup_19"
         android:layout_marginStart="@dimen/otstup_8"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="@dimen/otstup_44"
         android:ellipsize="end"
         android:maxLines="1"
@@ -53,7 +57,7 @@
         <TextView
             android:id="@+id/artist_name_text_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="13dp"
             android:textSize="@dimen/text_sixe3"
             style="@style/ispolnitel_vremy"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +82,7 @@
         <TextView
             android:id="@+id/track_time_text_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="13dp"
             android:textSize="@dimen/text_sixe3"
             style="@style/ispolnitel_vremy"
             app:layout_constraintStart_toEndOf="@id/dot_text_view"

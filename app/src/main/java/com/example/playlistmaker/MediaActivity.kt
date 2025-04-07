@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class MediaActivity : AppCompatActivity() {
 
@@ -39,7 +40,8 @@ class MediaActivity : AppCompatActivity() {
         val trackId = intent.getIntExtra("TRACK_ID", 0)
         val trackName = intent.getStringExtra("TRACK_NAME")
         val artistName = intent.getStringExtra("ARTIST_NAME")
-        val artworkUrl = intent.getStringExtra("ARTWORK_URL")?.replaceAfterLast('/', "512x512bb.jpg")
+        val artworkUrl =
+            intent.getStringExtra("ARTWORK_URL")?.replaceAfterLast('/', "512x512bb.jpg")
         val collectionName = intent.getStringExtra("COLLECTION_NAME")
         val releaseDate = intent.getStringExtra("RELEASE_DATE")
         val primaryGenre = intent.getStringExtra("PRIMARY_GENRE")
@@ -65,7 +67,10 @@ class MediaActivity : AppCompatActivity() {
 
         // Кнопка "Play/Pause"
         val playPauseButton = findViewById<ImageView>(R.id.imageView)
-        updatePlayPauseButtonState(playPauseButton, isTrackPlaying) // Устанавливаем начальное состояние кнопки
+        updatePlayPauseButtonState(
+            playPauseButton,
+            isTrackPlaying
+        ) // Устанавливаем начальное состояние кнопки
         playPauseButton.setOnClickListener {
             isTrackPlaying = !isTrackPlaying
             updatePlayPauseButtonState(playPauseButton, isTrackPlaying)
@@ -104,18 +109,19 @@ class MediaActivity : AppCompatActivity() {
         countryInfo.text = country ?: "Неизвестна"
         durationTextView.text = trackTimeFormatted
 
-        // Загружаем изображение обложки с помощью Glide.
+
         if (!artworkUrl.isNullOrEmpty()) {
+            val radiusInPx = resources.getDimensionPixelSize(R.dimen.corner_radius_big)
             Glide.with(this)
                 .load(artworkUrl)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder)
+                .transform(RoundedCorners(radiusInPx))  // Добавляем скругление через Glide
                 .into(artworkView)
         } else {
             artworkView.setImageResource(R.drawable.placeholder)
         }
     }
-
     // Метод для обновления состояния кнопки "Play/Pause"
     private fun updatePlayPauseButtonState(button: ImageView, isPlaying: Boolean) {
         button.setImageResource(if (isPlaying) R.drawable.buttonpase else R.drawable.button)

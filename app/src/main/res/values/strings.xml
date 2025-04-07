@@ -29,5 +29,8 @@
     <string name="janr">Жанр</string>
     <string name="strana">Страна</string>
 
+    <string name="unknown_track">Неизвестный трек</string>
+    <string name="unknown_artist">Неизвестный исполнитель</string>
+
 </resources>
 

@@ -14,40 +14,54 @@ import com.bumptech.glide.request.RequestOptions
 class TrackAdapter(
     private val context: Context,
     private var tracks: List<Track>,
-    private val onItemClick: (Track) -> Unit // Лямбда для обработки кликов
+    private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-    // Метод для обновления списка треков
+    // Разные радиусы для разных случаев
+    private val smallCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_small) // 2dp
+    private val bigCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_big)   // 8dp
+
+    // Оптимизированные настройки Glide
+    private val glideOptionsSmall = RequestOptions()
+        .placeholder(R.drawable.placeholder)
+        .error(R.drawable.placeholder)
+        .transform(RoundedCorners(smallCornerRadius))
+
+    private val glideOptionsBig = RequestOptions()
+        .placeholder(R.drawable.placeholder)
+        .error(R.drawable.placeholder)
+        .transform(RoundedCorners(bigCornerRadius))
+
+    // Флаг для определения типа отображения
+    var isLargeArtworkMode: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     fun updateTracks(newTracks: List<Track>) {
         tracks = newTracks
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        // Инициализация ViewHolder с использованием разметки item_track.xml
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_track, parent, false)
         return TrackViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        // Привязка данных к ViewHolder
         val track = tracks[position]
         holder.bind(track)
 
-        // Установка обработчика кликов
         holder.itemView.setOnClickListener {
-            // Подсветка элемента
             it.isPressed = true
-            it.postDelayed({ it.isPressed = false }, 200) // Сбрасываем состояние через 200 мс
-
-            // Вызов колбэка
+            it.postDelayed({ it.isPressed = false }, 200)
             onItemClick(track)
         }
     }
 
     override fun getItemCount(): Int = tracks.size
 
-    // Внутренний класс ViewHolder
     inner class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val artworkImageView: ImageView = itemView.findViewById(R.id.artwork_image_view)
         private val trackNameTextView: TextView = itemView.findViewById(R.id.track_name_text_view)
@@ -55,28 +69,23 @@ class TrackAdapter(
         private val trackTimeTextView: TextView = itemView.findViewById(R.id.track_time_text_view)
 
         fun bind(track: Track) {
-            // Установка названия трека
-            trackNameTextView.text = track.trackName ?: "Неизвестный трек"
+            trackNameTextView.text = track.trackName ?: context.getString(R.string.unknown_track)
+            artistNameTextView.text = track.artistName ?: context.getString(R.string.unknown_artist)
+            trackTimeTextView.text = track.trackTime ?: ""
 
-            // Установка имени исполнителя
-            artistNameTextView.text = track.artistName ?: "Неизвестный исполнитель"
+            loadArtwork(track)
+        }
 
-            // Установка времени трека
-            trackTimeTextView.text = track.trackTime
-
-            // Загрузка обложки с использованием Glide
+        private fun loadArtwork(track: Track) {
             if (track.artworkUrl100.isNullOrEmpty()) {
-                // Если ссылка на обложку отсутствует, показываем заглушку
                 artworkImageView.setImageResource(R.drawable.placeholder)
             } else {
+                // Выбираем настройки в зависимости от режима отображения
+                val options = if (isLargeArtworkMode) glideOptionsBig else glideOptionsSmall
+
                 Glide.with(context)
                     .load(track.artworkUrl100)
-                    .apply(
-                        RequestOptions()
-                            .placeholder(R.drawable.placeholder) // Заглушка во время загрузки
-                            .error(R.drawable.placeholder) // Заглушка при ошибке загрузки
-                            .transform(RoundedCorners(8)) // Скругление углов
-                    )
+                    .apply(options)
                     .into(artworkImageView)
             }
         }

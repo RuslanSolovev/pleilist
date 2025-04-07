@@ -19,4 +19,8 @@
     <dimen name="otstup_26">26dp</dimen>
     <dimen name="otstup_32">32dp</dimen>
 
+    <dimen name="corner_radius_small">2dp</dimen>  <!-- Для маленьких обложек -->
+    <dimen name="corner_radius_medium">4dp</dimen> <!-- Для средних -->
+    <dimen name="corner_radius_big">8dp</dimen>    <!-- Для больших -->
+
 </resources>
