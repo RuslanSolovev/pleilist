@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -13,7 +14,6 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,10 +37,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyRecyclerView: RecyclerView
     private lateinit var historyHeader: TextView
     private lateinit var clearHistoryButton: View
-
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var searchHistory: SearchHistory
-
     private var searchQuery: String? = null
     private val itunesApiService by lazy { createItunesApiService() }
 
@@ -64,14 +62,14 @@ class SearchActivity : AppCompatActivity() {
         // Настройка RecyclerView для результатов поиска
         recyclerView.layoutManager = LinearLayoutManager(this)
         trackAdapter = TrackAdapter(this, emptyList()) { track ->
-            handleTrackClick(track) // Обрабатываем клик на трек из результатов поиска
+            handleTrackClick(track)
         }
         recyclerView.adapter = trackAdapter
 
         // Настройка RecyclerView для истории
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyAdapter = TrackAdapter(this, searchHistory.getHistory()) { track ->
-            handleTrackClick(track) // Обрабатываем клик на трек из истории
+            handleTrackClick(track)
         }
         historyRecyclerView.adapter = historyAdapter
 
@@ -80,14 +78,19 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
-        // Управление видимостью кнопки "Очистить" и поведением подсказки
+        // Управление видимостью кнопки "Очистить" и поведением при изменении текста
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchQuery = s.toString()
                 if (s.isNullOrEmpty()) {
                     clearButton.visibility = View.GONE
                     searchEditText.hint = getString(R.string.poisk)
+                    // Очищаем результаты поиска и показываем историю
+                    trackAdapter.updateTracks(emptyList())
+                    recyclerView.visibility = View.GONE
+                    hidePlaceholder()
                     showHistory()
                 } else {
                     clearButton.visibility = View.VISIBLE
@@ -95,17 +98,15 @@ class SearchActivity : AppCompatActivity() {
                     hideHistory()
                 }
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
         // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
-            searchEditText.setText("") // Очищаем поле ввода
-            hideKeyboard(searchEditText) // Скрываем клавиатуру
-            trackAdapter.updateTracks(emptyList()) // Очищаем адаптер треков
-            recyclerView.visibility = View.GONE // Скрываем RecyclerView с результатами поиска
-            showHistory() // Показываем историю
-            hidePlaceholder() // Скрываем заглушку
+            searchEditText.setText("")
+            hideKeyboard(searchEditText)
+            // Остальная логика обрабатывается в TextWatcher
         }
 
         // Скрытие клавиатуры при клике вне поля ввода
@@ -118,7 +119,6 @@ class SearchActivity : AppCompatActivity() {
                     if (!rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                         hideKeyboard(view)
                         view.clearFocus()
-                        hideHistory()
                     }
                 }
             }
@@ -131,7 +131,7 @@ class SearchActivity : AppCompatActivity() {
                 val query = searchEditText.text.toString().trim()
                 if (query.isNotEmpty()) {
                     performSearch(query)
-                    hideKeyboard(searchEditText) // Скрываем клавиатуру
+                    hideKeyboard(searchEditText)
                 }
                 true
             } else {
@@ -171,60 +171,54 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && searchEditText.text.isEmpty()) {
                 showHistory()
-            } else {
-                hideHistory()
             }
         }
 
         // Инициализация начального состояния
         if (searchHistory.getHistory().isEmpty()) {
-            hideHistory() // Скрываем историю, если она пуста
+            hideHistory()
         }
     }
 
-    // Метод для выполнения поискового запроса
     private fun performSearch(query: String) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = itunesApiService.search(query)
                 if (response.isSuccessful && response.body() != null) {
                     val tracks = response.body()!!.results
-                    if (tracks.isEmpty()) {
-                        showPlaceholder(PlaceholderType.NO_RESULTS)
-                    } else {
-                        trackAdapter.updateTracks(tracks)
-                        showContent()
+                    runOnUiThread {
+                        if (tracks.isEmpty()) {
+                            showPlaceholder(PlaceholderType.NO_RESULTS)
+                        } else {
+                            trackAdapter.updateTracks(tracks)
+                            showContent()
+                        }
                     }
                 } else {
-                    showPlaceholder(PlaceholderType.ERROR)
+                    runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
                 }
             } catch (e: Exception) {
-                showPlaceholder(PlaceholderType.ERROR)
+                runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
             }
         }
     }
 
-    // Метод для скрытия клавиатуры
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    // Отображение контента
     private fun showContent() {
         recyclerView.visibility = View.VISIBLE
         placeholderView.visibility = View.GONE
         hideHistory()
     }
 
-    // Отображение заглушки
     private fun showPlaceholder(type: PlaceholderType) {
         recyclerView.visibility = View.GONE
         placeholderView.visibility = View.VISIBLE
         val placeholderImage = findViewById<ImageView>(R.id.placeholder_image)
         val placeholderText = findViewById<TextView>(R.id.placeholder_text)
-        val retryButton = findViewById<View>(R.id.retry_button)
-
         when (type) {
             PlaceholderType.NO_RESULTS -> {
                 placeholderImage.setImageResource(R.drawable.light_mode)
@@ -239,12 +233,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Скрытие заглушки
     private fun hidePlaceholder() {
         placeholderView.visibility = View.GONE
     }
 
-    // Показать историю поиска
     private fun showHistory() {
         val history = searchHistory.getHistory()
         if (history.isNotEmpty()) {
@@ -257,60 +249,52 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Скрыть историю поиска
     private fun hideHistory() {
         historyHeader.visibility = View.GONE
         historyRecyclerView.visibility = View.GONE
         clearHistoryButton.visibility = View.GONE
     }
 
-    // Обработка клика на трек
     private fun handleTrackClick(track: Track) {
-        // Получаем текущую историю
         val history = searchHistory.getHistory().toMutableList()
-
-        // Проверяем, есть ли трек в истории
         val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
-
         if (existingIndex != -1) {
-            // Если трек уже есть в истории, перемещаем его на первое место
             history.removeAt(existingIndex)
         }
-
-        // Добавляем трек в начало истории
         history.add(0, track)
-
-        // Если история превышает 10 элементов, удаляем последний
         if (history.size > 10) {
             history.removeAt(history.size - 1)
         }
-
-        // Сохраняем обновленную историю
         searchHistory.saveHistory(history)
-
-        // Обновляем адаптер истории
         historyAdapter.updateTracks(history)
 
-        // Воспроизводим трек (пока просто показываем Toast)
-        Toast.makeText(this, "Добавлен в историю: ${track.trackName}", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, MediaActivity::class.java).apply {
+            putExtra("TRACK_ID", track.trackId)
+            putExtra("TRACK_NAME", track.trackName)
+            putExtra("ARTIST_NAME", track.artistName)
+            putExtra("ARTWORK_URL", track.artworkUrl100)
+            putExtra("COLLECTION_NAME", track.collectionName)
+            putExtra("RELEASE_DATE", track.releaseDate)
+            putExtra("PRIMARY_GENRE", track.primaryGenreName)
+            putExtra("COUNTRY", track.country)
+            putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+        }
+        startActivity(intent)
     }
 
-    // Создание Retrofit сервиса
     private fun createItunesApiService(): ItunesApiService {
-        val retrofit = Retrofit.Builder()
+        return Retrofit.Builder()
             .baseUrl("https://itunes.apple.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        return retrofit.create(ItunesApiService::class.java)
+            .create(ItunesApiService::class.java)
     }
 
-    // Сохранение состояния
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("SEARCH_QUERY", searchQuery)
     }
 
-    // Восстановление состояния
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchQuery = savedInstanceState.getString("SEARCH_QUERY")
@@ -327,13 +311,16 @@ class SearchActivity : AppCompatActivity() {
     }
 }
 
-// Интерфейс для работы с iTunes API
 interface ItunesApiService {
-    @GET("/search?entity=song")
-    suspend fun search(@Query("term") text: String): Response<ItunesSearchResponse>
+    @GET("search")
+    suspend fun search(
+        @Query("term") term: String,
+        @Query("entity") entity: String = "song",
+        @Query("country") country: String = "US",
+
+    ): Response<ItunesSearchResponse>
 }
 
-// Перечисление типов заглушек
 enum class PlaceholderType {
     NO_RESULTS, ERROR
 }

@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/search_frame"
         android:clipToPadding="false"
-        android:paddingTop="@dimen/otstup_8"
+        android:layout_marginTop="@dimen/otstup_big"
         android:paddingBottom="@dimen/otstup_8"
         android:scrollbars="vertical" />
 
@@ -142,15 +142,15 @@
 
         <TextView
             android:id="@+id/Text_Istoriy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/vi_iskali"
-            android:gravity="center"
-            android:textSize="@dimen/otstup_19"
             style="@style/text_zagluhka"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/ys_display_regular"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="18dp" />
+            android:gravity="center"
+            android:text="@string/vi_iskali"
+            android:textSize="@dimen/otstup_19" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_Istory"
@@ -158,8 +158,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingTop="@dimen/otstup_8"
-            android:paddingBottom="@dimen/otstup_8"
+
+
             android:scrollbars="vertical" />
 
         <Button
