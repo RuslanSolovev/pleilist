@@ -110,7 +110,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/otstup_big"
         android:gravity="center"
-        android:text="30"
+        android:text="00:00"
         style="@style/zagolovok"
 
         android:textSize="14sp"

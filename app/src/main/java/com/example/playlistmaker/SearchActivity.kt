@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -13,8 +15,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +45,26 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistory: SearchHistory
     private var searchQuery: String? = null
     private val itunesApiService by lazy { createItunesApiService() }
+    private  lateinit var progressBar: ProgressBar
+    private var isClickAllowed = true
+    private val clickHandler = Handler(Looper.getMainLooper())
+
+    // Handler и Runnable для реализации debounce
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable {
+        searchQuery?.let { query ->
+            if (query.isNotEmpty()) {
+                performSearch(query)
+            }
+        }
+    }
+
+
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +79,7 @@ class SearchActivity : AppCompatActivity() {
         historyRecyclerView = findViewById(R.id.recycler_view_Istory)
         historyHeader = findViewById(R.id.Text_Istoriy)
         clearHistoryButton = findViewById(R.id.Ochistit_Istotiy)
+        progressBar = findViewById(R.id.progressBar)
 
         // Инициализация SearchHistory
         searchHistory = SearchHistory(getSharedPreferences("AppPrefs", MODE_PRIVATE))
@@ -92,10 +117,16 @@ class SearchActivity : AppCompatActivity() {
                     recyclerView.visibility = View.GONE
                     hidePlaceholder()
                     showHistory()
+                    progressBar.visibility = View.GONE
                 } else {
                     clearButton.visibility = View.VISIBLE
                     searchEditText.hint = null
                     hideHistory()
+
+                    // Сбрасываем предыдущий запланированный запрос
+                    searchHandler.removeCallbacks(searchRunnable)
+                    // Планируем новый запрос через 2 секунды
+                    searchHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
                 }
             }
 
@@ -181,12 +212,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun performSearch(query: String) {
+        progressBar.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = itunesApiService.search(query)
                 if (response.isSuccessful && response.body() != null) {
                     val tracks = response.body()!!.results
                     runOnUiThread {
+                        progressBar.visibility = View.GONE
                         if (tracks.isEmpty()) {
                             showPlaceholder(PlaceholderType.NO_RESULTS)
                         } else {
@@ -195,10 +228,14 @@ class SearchActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        showPlaceholder(PlaceholderType.ERROR) }
                 }
             } catch (e: Exception) {
-                runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    showPlaceholder(PlaceholderType.ERROR) }
             }
         }
     }
@@ -256,6 +293,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun handleTrackClick(track: Track) {
+
+        if (!isClickAllowed) {
+            return
+        }
+        isClickAllowed = false
+        clickHandler.postDelayed({
+            isClickAllowed = true
+        }, CLICK_DEBOUNCE_DELAY)
+
+
         val history = searchHistory.getHistory().toMutableList()
         val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
         if (existingIndex != -1) {
@@ -267,7 +314,6 @@ class SearchActivity : AppCompatActivity() {
         }
         searchHistory.saveHistory(history)
         historyAdapter.updateTracks(history)
-
         val intent = Intent(this, MediaActivity::class.java).apply {
             putExtra("TRACK_ID", track.trackId)
             putExtra("TRACK_NAME", track.trackName)
@@ -278,6 +324,7 @@ class SearchActivity : AppCompatActivity() {
             putExtra("PRIMARY_GENRE", track.primaryGenreName)
             putExtra("COUNTRY", track.country)
             putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+            putExtra("PREVIEW_URL", track.previewUrl)
         }
         startActivity(intent)
     }
@@ -317,7 +364,6 @@ interface ItunesApiService {
         @Query("term") term: String,
         @Query("entity") entity: String = "song",
         @Query("country") country: String = "US",
-
     ): Response<ItunesSearchResponse>
 }
 
