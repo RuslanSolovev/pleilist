@@ -11,6 +11,9 @@
 
 </style>
 
+    <style name="progres_bar">
+        <item name="android:indeterminateTint">@color/sinii</item>
+    </style>
 
 
 </resources>

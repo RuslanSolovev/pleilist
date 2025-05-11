@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -13,8 +15,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,12 +45,28 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistory: SearchHistory
     private var searchQuery: String? = null
     private val itunesApiService by lazy { createItunesApiService() }
+    private lateinit var progressBar: ProgressBar
+    private var isClickAllowed = true
+    private val clickHandler = Handler(Looper.getMainLooper())
+
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable {
+        searchQuery?.let { query ->
+            if (query.isNotEmpty()) {
+                performSearch(query)
+            }
+        }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        // Инициализация UI элементов
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
         recyclerView = findViewById(R.id.recycler_view)
@@ -55,30 +75,26 @@ class SearchActivity : AppCompatActivity() {
         historyRecyclerView = findViewById(R.id.recycler_view_Istory)
         historyHeader = findViewById(R.id.Text_Istoriy)
         clearHistoryButton = findViewById(R.id.Ochistit_Istotiy)
+        progressBar = findViewById(R.id.progressBar)
 
-        // Инициализация SearchHistory
         searchHistory = SearchHistory(getSharedPreferences("AppPrefs", MODE_PRIVATE))
 
-        // Настройка RecyclerView для результатов поиска
         recyclerView.layoutManager = LinearLayoutManager(this)
         trackAdapter = TrackAdapter(this, emptyList()) { track ->
             handleTrackClick(track)
         }
         recyclerView.adapter = trackAdapter
 
-        // Настройка RecyclerView для истории
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyAdapter = TrackAdapter(this, searchHistory.getHistory()) { track ->
             handleTrackClick(track)
         }
         historyRecyclerView.adapter = historyAdapter
 
-        // Обработка кнопки "Назад"
         findViewById<ImageButton>(R.id.back_button2).setOnClickListener {
             finish()
         }
 
-        // Управление видимостью кнопки "Очистить" и поведением при изменении текста
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -87,29 +103,26 @@ class SearchActivity : AppCompatActivity() {
                 if (s.isNullOrEmpty()) {
                     clearButton.visibility = View.GONE
                     searchEditText.hint = getString(R.string.poisk)
-                    // Очищаем результаты поиска и показываем историю
                     trackAdapter.updateTracks(emptyList())
-                    recyclerView.visibility = View.GONE
-                    hidePlaceholder()
+                    hideAllContent()
                     showHistory()
                 } else {
                     clearButton.visibility = View.VISIBLE
                     searchEditText.hint = null
                     hideHistory()
+                    searchHandler.removeCallbacks(searchRunnable)
+                    searchHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
             searchEditText.setText("")
             hideKeyboard(searchEditText)
-            // Остальная логика обрабатывается в TextWatcher
         }
 
-        // Скрытие клавиатуры при клике вне поля ввода
         findViewById<View>(android.R.id.content).setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val view = currentFocus
@@ -125,7 +138,6 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        // Обработка нажатия кнопки "Done" на клавиатуре
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = searchEditText.text.toString().trim()
@@ -139,20 +151,17 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // Обработка нажатия на кнопку "Обновить"
         retryButton.setOnClickListener {
             searchQuery?.let { query ->
                 performSearch(query)
             }
         }
 
-        // Обработка нажатия на кнопку "Очистить историю"
         clearHistoryButton.setOnClickListener {
             searchHistory.clearHistory()
             hideHistory()
         }
 
-        // Восстановление состояния
         if (savedInstanceState != null) {
             searchQuery = savedInstanceState.getString("SEARCH_QUERY")
             searchEditText.setText(searchQuery)
@@ -167,26 +176,26 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // Отслеживание фокуса на поле поиска
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && searchEditText.text.isEmpty()) {
                 showHistory()
             }
         }
 
-        // Инициализация начального состояния
         if (searchHistory.getHistory().isEmpty()) {
             hideHistory()
         }
     }
 
     private fun performSearch(query: String) {
+        showLoading()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = itunesApiService.search(query)
                 if (response.isSuccessful && response.body() != null) {
                     val tracks = response.body()!!.results
                     runOnUiThread {
+                        hideLoading()
                         if (tracks.isEmpty()) {
                             showPlaceholder(PlaceholderType.NO_RESULTS)
                         } else {
@@ -195,12 +204,36 @@ class SearchActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
+                    runOnUiThread {
+                        hideLoading()
+                        showPlaceholder(PlaceholderType.ERROR)
+                    }
                 }
             } catch (e: Exception) {
-                runOnUiThread { showPlaceholder(PlaceholderType.ERROR) }
+                runOnUiThread {
+                    hideLoading()
+                    showPlaceholder(PlaceholderType.ERROR)
+                }
             }
         }
+    }
+
+    private fun showLoading() {
+        progressBar.isVisible = true
+        recyclerView.isVisible = false
+        placeholderView.isVisible = false
+        historyRecyclerView.isVisible = false
+        historyHeader.isVisible = false
+        clearHistoryButton.isVisible = false
+    }
+
+    private fun hideLoading() {
+        progressBar.isVisible = false
+    }
+
+    private fun hideAllContent() {
+        recyclerView.isVisible = false
+        placeholderView.isVisible = false
     }
 
     private fun hideKeyboard(view: View) {
@@ -209,40 +242,40 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showContent() {
-        recyclerView.visibility = View.VISIBLE
-        placeholderView.visibility = View.GONE
+        recyclerView.isVisible = true
+        placeholderView.isVisible = false
         hideHistory()
     }
 
     private fun showPlaceholder(type: PlaceholderType) {
-        recyclerView.visibility = View.GONE
-        placeholderView.visibility = View.VISIBLE
+        recyclerView.isVisible = false
+        placeholderView.isVisible = true
         val placeholderImage = findViewById<ImageView>(R.id.placeholder_image)
         val placeholderText = findViewById<TextView>(R.id.placeholder_text)
         when (type) {
             PlaceholderType.NO_RESULTS -> {
                 placeholderImage.setImageResource(R.drawable.light_mode)
                 placeholderText.text = getString(R.string.no_results)
-                retryButton.visibility = View.GONE
+                retryButton.isVisible = false
             }
             PlaceholderType.ERROR -> {
                 placeholderImage.setImageResource(R.drawable.nointer)
                 placeholderText.text = getString(R.string.server_error)
-                retryButton.visibility = View.VISIBLE
+                retryButton.isVisible = true
             }
         }
     }
 
     private fun hidePlaceholder() {
-        placeholderView.visibility = View.GONE
+        placeholderView.isVisible = false
     }
 
     private fun showHistory() {
         val history = searchHistory.getHistory()
         if (history.isNotEmpty()) {
-            historyHeader.visibility = View.VISIBLE
-            historyRecyclerView.visibility = View.VISIBLE
-            clearHistoryButton.visibility = View.VISIBLE
+            historyHeader.isVisible = true
+            historyRecyclerView.isVisible = true
+            clearHistoryButton.isVisible = true
             historyAdapter.updateTracks(history)
         } else {
             hideHistory()
@@ -250,21 +283,21 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideHistory() {
-        historyHeader.visibility = View.GONE
-        historyRecyclerView.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
+        historyHeader.isVisible = false
+        historyRecyclerView.isVisible = false
+        clearHistoryButton.isVisible = false
     }
 
     private fun handleTrackClick(track: Track) {
+        if (!isClickAllowed) return
+        isClickAllowed = false
+        clickHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+
         val history = searchHistory.getHistory().toMutableList()
         val existingIndex = history.indexOfFirst { it.trackId == track.trackId }
-        if (existingIndex != -1) {
-            history.removeAt(existingIndex)
-        }
+        if (existingIndex != -1) history.removeAt(existingIndex)
         history.add(0, track)
-        if (history.size > 10) {
-            history.removeAt(history.size - 1)
-        }
+        if (history.size > 10) history.removeAt(history.size - 1)
         searchHistory.saveHistory(history)
         historyAdapter.updateTracks(history)
 
@@ -278,6 +311,7 @@ class SearchActivity : AppCompatActivity() {
             putExtra("PRIMARY_GENRE", track.primaryGenreName)
             putExtra("COUNTRY", track.country)
             putExtra("TRACK_TIME_MILLIS", track.trackTimeMillis)
+            putExtra("PREVIEW_URL", track.previewUrl)
         }
         startActivity(intent)
     }
@@ -300,11 +334,11 @@ class SearchActivity : AppCompatActivity() {
         searchQuery = savedInstanceState.getString("SEARCH_QUERY")
         searchEditText.setText(searchQuery)
         if (!searchQuery.isNullOrEmpty()) {
-            clearButton.visibility = View.VISIBLE
+            clearButton.isVisible = true
             searchEditText.hint = null
             performSearch(searchQuery!!)
         } else {
-            clearButton.visibility = View.GONE
+            clearButton.isVisible = false
             searchEditText.hint = getString(R.string.poisk)
             showHistory()
         }
@@ -317,7 +351,6 @@ interface ItunesApiService {
         @Query("term") term: String,
         @Query("entity") entity: String = "song",
         @Query("country") country: String = "US",
-
     ): Response<ItunesSearchResponse>
 }
 
