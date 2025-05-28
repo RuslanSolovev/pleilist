@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class ThemeInteractorImpl @Inject constructor(
     }
 
     private val _themeFlow = MutableStateFlow(sharedPreferences.getBoolean(KEY_DARK_THEME, false))
-    override fun getThemeFlow(): Flow<Boolean> = _themeFlow.asStateFlow()
+    override fun getThemeFlow(): StateFlow<Boolean> = _themeFlow.asStateFlow()
 
     override suspend fun isDarkThemeEnabled(): Boolean = withContext(Dispatchers.IO) {
         sharedPreferences.getBoolean(KEY_DARK_THEME, false)

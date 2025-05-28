@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
-
 import com.example.playlistmaker.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,19 +20,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        viewModel.darkThemeEnabled.observe(this) {
-
-        }
+        viewModel.darkThemeEnabled.observe(this) {}
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
         setupEdgeToEdge()
         setupNavigationButtons()
+
+
     }
-
-
 
     private fun setupEdgeToEdge() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -47,11 +43,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_poisk).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
-
         findViewById<Button>(R.id.button_musika).setOnClickListener {
             startActivity(Intent(this, MediaActivity::class.java))
         }
-
         findViewById<Button>(R.id.button_nastroi).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }

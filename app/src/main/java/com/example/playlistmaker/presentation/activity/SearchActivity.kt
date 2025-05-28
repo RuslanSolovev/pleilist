@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
+
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.presentation.SearchState
 import com.example.playlistmaker.presentation.SearchViewModel

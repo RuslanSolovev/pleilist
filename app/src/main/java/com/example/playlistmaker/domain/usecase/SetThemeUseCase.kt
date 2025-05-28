@@ -1,10 +1,12 @@
 package com.example.playlistmaker.domain.usecase
 
-import com.example.playlistmaker.domain.repository.ThemeRepository
+import com.example.playlistmaker.domain.interactor.ThemeInteractor
 import javax.inject.Inject
 
 class SetThemeUseCase @Inject constructor(
-    private val repository: ThemeRepository
+    private val interactor: ThemeInteractor
 ) {
-    operator fun invoke(isDark: Boolean) = repository.saveTheme(isDark)
+    operator fun invoke(enabled: Boolean) {
+        interactor.setDarkThemeEnabled(enabled)
+    }
 }

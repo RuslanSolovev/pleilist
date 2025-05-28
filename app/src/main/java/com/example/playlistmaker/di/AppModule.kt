@@ -3,7 +3,7 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmaker.data.player.AudioPlayerImpl
+import com.example.playlistmaker.data.repository.AudioPlayerImpl
 import com.example.playlistmaker.data.repository.LikeRepositoryImpl
 
 import com.example.playlistmaker.data.repository.ThemeRepositoryImpl
@@ -14,7 +14,7 @@ import com.example.playlistmaker.domain.repository.ThemeRepository
 import com.example.playlistmaker.domain.usecase.GetThemeUseCase
 import com.example.playlistmaker.domain.usecase.SetThemeUseCase
 
-import com.example.playlistmaker.domain.player.AudioPlayer
+import com.example.playlistmaker.domain.repository.AudioPlayer
 import com.example.playlistmaker.domain.repositories.LikeRepository
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.presentation.player.MediaPlayerController
@@ -56,15 +56,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGetThemeUseCase(repository: ThemeRepository): GetThemeUseCase {
-        return GetThemeUseCase(repository)
+    fun provideGetThemeUseCase(interactor: ThemeInteractor): GetThemeUseCase {
+        return GetThemeUseCase(interactor)
     }
+
 
     @Provides
     @Singleton
-    fun provideSetThemeUseCase(repository: ThemeRepository): SetThemeUseCase {
-        return SetThemeUseCase(repository)
+    fun provideSetThemeUseCase(interactor: ThemeInteractor): SetThemeUseCase {
+        return SetThemeUseCase(interactor)
     }
+
 
     @Provides
     @Singleton

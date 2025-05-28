@@ -2,7 +2,7 @@ package com.example.playlistmaker.presentation.player
 
 import android.os.Handler
 import android.os.Looper
-import com.example.playlistmaker.domain.player.AudioPlayer
+import com.example.playlistmaker.domain.repository.AudioPlayer
 import com.example.playlistmaker.domain.util.TimeFormatter
 
 @Suppress("unused") // Добавляем, чтобы избежать серого выделения при использовании DI

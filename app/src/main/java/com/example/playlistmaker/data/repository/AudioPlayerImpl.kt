@@ -1,14 +1,13 @@
-package com.example.playlistmaker.data.player
+package com.example.playlistmaker.data.repository
 
 import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
-import com.example.playlistmaker.domain.player.AudioPlayer
+import com.example.playlistmaker.domain.repository.AudioPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class AudioPlayerImpl @Inject constructor(
-    @ApplicationContext private val context: Context
 ) : AudioPlayer {
 
     private var mediaPlayer: MediaPlayer? = null

@@ -20,6 +20,7 @@ class MainViewModel @Inject constructor(
 
     init {
         _darkThemeEnabled.value = getThemeUseCase()
+        applyGlobalTheme(_darkThemeEnabled.value ?: false)
     }
 
     fun toggleTheme() {

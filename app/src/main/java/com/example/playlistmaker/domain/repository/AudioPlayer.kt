@@ -1,4 +1,4 @@
-package com.example.playlistmaker.domain.player
+package com.example.playlistmaker.domain.repository
 
 interface AudioPlayer {
     fun prepare(url: String, onPrepared: () -> Unit, onError: () -> Unit)
