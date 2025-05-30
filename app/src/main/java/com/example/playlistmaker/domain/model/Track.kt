@@ -1,16 +1,11 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.domain.model
 
-
-data class ItunesSearchResponse(
-    val resultCount: Int,
-    val results: List<Track>
-)
-
+// domain/model/Track.kt
 data class Track(
     val trackId: Int,
     val trackName: String?,
     val artistName: String?,
-    val trackTimeMillis: Long?,
+    val trackTimeMillis: Long?, // ← добавь это
     val artworkUrl100: String?,
     val collectionName: String?,
     val releaseDate: String?,
@@ -23,12 +18,5 @@ data class Track(
             val minutes = trackTimeMillis / 60000
             val seconds = (trackTimeMillis % 60000) / 1000
             String.format("%02d:%02d", minutes, seconds)
-        } else {
-            "--:--"
-        }
-
-    // Функция для получения ссылки на обложку высокого качества.
-    fun getCoverArtwork(): String? {
-        return artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
-    }
+        } else "--:--"
 }
