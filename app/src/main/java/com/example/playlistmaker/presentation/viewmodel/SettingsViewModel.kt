@@ -1,29 +1,41 @@
 package com.example.playlistmaker.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import com.example.playlistmaker.presentation.utils.SingleLiveEvent
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val themeInteractor: ThemeInteractor
+    private val themeInteractor: ThemeInteractor,
 ) : ViewModel() {
 
-    val darkThemeEnabled: LiveData<Boolean> = themeInteractor.getThemeFlow().asLiveData()
+    private val _shareEvent = SingleLiveEvent<String>()
+    val shareEvent: LiveData<String> = _shareEvent
 
-    private val _shareAppEvent = MutableLiveData<String>()
-    val shareAppEvent: LiveData<String> = _shareAppEvent
+    private val _supportEvent = SingleLiveEvent<Unit>()
+    val supportEvent: LiveData<Unit> = _supportEvent
 
-    fun toggleTheme() {
-        val current = darkThemeEnabled.value ?: false
-        themeInteractor.setDarkThemeEnabled(!current)
+    private val _termsEvent = SingleLiveEvent<String>()
+    val termsEvent: LiveData<String> = _termsEvent
+
+    fun isDarkThemeEnabled(): Boolean = themeInteractor.isDarkThemeEnabled()
+
+    fun toggleTheme(isEnabled: Boolean) {
+        themeInteractor.setDarkThemeEnabled(isEnabled)
     }
 
     fun onShareClicked() {
-        _shareAppEvent.value = "https://practicum.yandex.ru/android-developer/"
+        _shareEvent.value = "Check out this cool app!"
+    }
+
+    fun onSupportClicked() {
+        _supportEvent.call()
+    }
+
+    fun onTermsClicked() {
+        _termsEvent.value = "https://example.com/terms"
     }
 }

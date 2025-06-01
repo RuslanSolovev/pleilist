@@ -32,5 +32,10 @@
     <string name="unknown_track">Неизвестный трек</string>
     <string name="unknown_artist">Неизвестный исполнитель</string>
 
+    <string name="no_email_client_message">На устройстве не найдено приложение для отправки email.</string>
+    <string name="cant_open_terms">Не удалось открыть условия использования</string>
+
+
+
 </resources>
 
