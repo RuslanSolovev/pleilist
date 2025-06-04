@@ -1,3 +1,4 @@
+// ThemeInteractorImpl.kt в data/interactor
 package com.example.playlistmaker.data.interactor
 
 import android.content.SharedPreferences

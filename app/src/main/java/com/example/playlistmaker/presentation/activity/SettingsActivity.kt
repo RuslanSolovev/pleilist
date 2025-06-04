@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.utils.SettingsEvent
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,7 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         setupWindowInsets()
         setupThemeSwitch()
         setupClickListeners()
-        observeViewModelEvents()
+        observeEvents()
     }
 
     private fun setupWindowInsets() {
@@ -43,10 +44,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupThemeSwitch() {
         val themeSwitch = findViewById<Switch>(R.id.theme_switch)
-        themeSwitch.isChecked = viewModel.isDarkThemeEnabled()
+        themeSwitch.isChecked = viewModel.getCurrentTheme() //
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.toggleTheme(isChecked)
+            viewModel.updateTheme(isChecked) //
             applyTheme(isChecked)
         }
     }
@@ -64,46 +65,52 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<LinearLayout>(R.id.share_button).setOnClickListener {
-            viewModel.onShareClicked()
+            viewModel.shareApp()
         }
 
         findViewById<LinearLayout>(R.id.support_button).setOnClickListener {
-            viewModel.onSupportClicked()
+            viewModel.contactSupport()
         }
 
         findViewById<LinearLayout>(R.id.terms_button).setOnClickListener {
-            viewModel.onTermsClicked()
+            viewModel.openTerms()
         }
     }
 
-    private fun observeViewModelEvents() {
-        viewModel.shareEvent.observe(this) { shareText ->
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareText)
+    private fun observeEvents() {
+        viewModel.event.observe(this) { event ->
+            when (event) {
+                is SettingsEvent.Share -> handleShare(event.text)
+                is SettingsEvent.Support -> handleSupport(event.intent, event.errorMessage)
+                is SettingsEvent.Terms -> handleTerms(event.url)
             }
-            startActivity(Intent.createChooser(intent, getString(R.string.podel_cherez)))
         }
+    }
 
-        viewModel.supportEvent.observe(this) {
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:support@example.com")
-                putExtra(Intent.EXTRA_SUBJECT, "Playlist Maker Support")
-                putExtra(Intent.EXTRA_TEXT, "Describe your issue here...")
-            }
+    private fun handleShare(text: String) {
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }.let { startActivity(Intent.createChooser(it, getString(R.string.share_via))) }
+    }
+
+    private fun handleSupport(intent: Intent, errorMessage: String) {
+        try {
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(intent)
             } else {
-                Toast.makeText(this, "Нет почтового клиента", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
             }
+        } catch (e: Exception) {
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         }
+    }
 
-        viewModel.termsEvent.observe(this) { url ->
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-            } catch (e: Exception) {
-                Toast.makeText(this, "Cannot open browser", Toast.LENGTH_SHORT).show()
-            }
+    private fun handleTerms(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: Exception) {
+            Toast.makeText(this, "Cannot open browser", Toast.LENGTH_SHORT).show()
         }
     }
 }

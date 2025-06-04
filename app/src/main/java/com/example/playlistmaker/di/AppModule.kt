@@ -7,25 +7,23 @@ import com.example.playlistmaker.data.repository.AudioPlayerImpl
 import com.example.playlistmaker.data.repository.HistoryRepositoryImpl
 import com.example.playlistmaker.data.repository.LikeRepositoryImpl
 import com.example.playlistmaker.data.repository.SearchRepositoryImpl
-
 import com.example.playlistmaker.data.dto.ItunesApiService
+import com.example.playlistmaker.data.interactor.SupportInteractorImpl
 import com.example.playlistmaker.data.interactor.ThemeInteractorImpl
+import com.example.playlistmaker.domain.interactor.AudioPlayerInteractor
 import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.HistoryInteractorImpl
+import com.example.playlistmaker.domain.interactor.MediaPlayerInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractorImpl
 import com.example.playlistmaker.domain.interactor.SupportInteractor
-import com.example.playlistmaker.domain.interactor.SupportInteractorImpl
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
-
 import com.example.playlistmaker.domain.repositories.LikeRepository
 import com.example.playlistmaker.domain.repository.AudioPlayer
 import com.example.playlistmaker.domain.repository.HistoryRepository
-
 import com.example.playlistmaker.domain.repository.SearchRepository
-
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
-import com.example.playlistmaker.presentation.player.MediaPlayerController
+import com.example.playlistmaker.domain.util.TimeFormatter
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -56,7 +54,6 @@ object AppModule {
         return retrofit.create(ItunesApiService::class.java)
     }
 
-
     // SharedPreferences
     @Provides
     @Singleton
@@ -83,13 +80,6 @@ object AppModule {
         return LikeRepositoryImpl(sharedPreferences)
     }
 
-    @Provides
-    @Singleton
-    fun provideAudioPlayer(): AudioPlayer {
-        return AudioPlayerImpl()
-    }
-
-
     // Use Cases
     @Provides
     @Singleton
@@ -104,20 +94,40 @@ object AppModule {
         return context.resources
     }
 
-    // MediaPlayerController
     @Provides
     @Singleton
-    fun provideMediaPlayerController(
-        audioPlayer: AudioPlayer
-    ): MediaPlayerController {
-        return MediaPlayerController(
-            audioPlayer = audioPlayer,
-            trackUrl = "",
-            onTimeUpdate = {},
-            onPlayStateChanged = {},
-            onLikeStateChanged = {},
-            onError = {}
-        )
+    fun provideThemeInteractorImpl(sharedPreferences: SharedPreferences): ThemeInteractorImpl {
+        return ThemeInteractorImpl(sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAudioPlayer(): AudioPlayerImpl {
+        return AudioPlayerImpl()
+    }
+
+    // Provide AudioPlayerInteractor
+    @Provides
+    @Singleton
+    fun provideAudioPlayerInteractor(audioPlayer: AudioPlayerImpl): AudioPlayerInteractor {
+        return AudioPlayerInteractor(audioPlayer)
+    }
+
+    // Provide TimeFormatter
+    @Provides
+    @Singleton
+    fun provideTimeFormatter(): TimeFormatter {
+        return TimeFormatter
+    }
+
+    // Provide MediaPlayerInteractor
+    @Provides
+    @Singleton
+    fun provideMediaPlayerInteractor(
+        audioPlayerInteractor: AudioPlayerInteractor,
+        timeFormatter: TimeFormatter
+    ): MediaPlayerInteractor {
+        return MediaPlayerInteractor(audioPlayerInteractor, timeFormatter)
     }
 }
 
