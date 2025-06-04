@@ -8,7 +8,7 @@ fun TrackDto.toDomain(): Track {
         trackId = trackId,
         trackName = trackName,
         artistName = artistName,
-        trackTimeMillis = trackTimeMillis, // теперь напрямую передаём
+        trackTimeMillis = trackTimeMillis,
         artworkUrl100 = artworkUrl100,
         collectionName = collectionName,
         releaseDate = releaseDate,

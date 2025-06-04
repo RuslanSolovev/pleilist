@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.viewmodel.MediaViewModel
+import com.example.playlistmaker.presentation.player.PlayerUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -21,21 +21,17 @@ import kotlinx.coroutines.launch
 class MediaActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MediaViewModel
-
     private lateinit var currentTimeTextView: TextView
     private lateinit var playPauseButton: ImageView
     private lateinit var likeButton: ImageView
-
     private var trackId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
-        // Получение ViewModel через Hilt
         viewModel = ViewModelProvider(this)[MediaViewModel::class.java]
 
-        // Инициализация View
         currentTimeTextView = findViewById(R.id.otzet_vremy)
         playPauseButton = findViewById(R.id.imageView)
         likeButton = findViewById(R.id.imageView3)
@@ -50,31 +46,10 @@ class MediaActivity : AppCompatActivity() {
         val country = intent.getStringExtra("COUNTRY")
         val trackTimeMillis = intent.getLongExtra("TRACK_TIME_MILLIS", 0L)
         val previewUrl = intent.getStringExtra("PREVIEW_URL")
-        if (previewUrl != null) {
-            viewModel.preparePlayer(previewUrl)
-        }
 
-        // Передача данных в ViewModel
         viewModel.setTrackId(trackId)
+        previewUrl?.let { viewModel.preparePlayer(it) }
 
-        // Подписка на обновления времени
-        lifecycleScope.launch {
-            viewModel.currentTime.collectLatest { time ->
-                currentTimeTextView.text = time
-            }
-        }
-
-        // Подписка на состояние воспроизведения
-        viewModel.playState.observe(this) { isPlaying ->
-            playPauseButton.setImageResource(if (isPlaying) R.drawable.buttonpase else R.drawable.button)
-        }
-
-        // Подписка на лайки
-        viewModel.isLiked.observe(this) { liked ->
-            likeButton.setImageResource(if (liked) R.drawable.button__4_ else R.drawable.button__3_)
-        }
-
-        // Инициализация UI
         initViews(
             trackName,
             artistName,
@@ -86,17 +61,34 @@ class MediaActivity : AppCompatActivity() {
             TimeFormatter.formatTrackTime(trackTimeMillis)
         )
 
-        // Обработчики событий
-        playPauseButton.setOnClickListener {
-            viewModel.togglePlayPause()
-        }
+        setupObservers()
+        setupClickListeners()
+    }
 
-        likeButton.setOnClickListener {
-            viewModel.toggleLike()
+    private fun setupObservers() {
+        lifecycleScope.launch {
+            viewModel.uiState.collectLatest { state ->
+                when (state) {
+                    is PlayerUiState.Content -> {
+                        currentTimeTextView.text = state.currentTime
+                        playPauseButton.setImageResource(
+                            if (state.isPlaying) R.drawable.buttonpase else R.drawable.button
+                        )
+                        likeButton.setImageResource(
+                            if (state.isLiked) R.drawable.button__4_ else R.drawable.button__3_
+                        )
+                    }
+                    is PlayerUiState.Error -> showError(state.message)
+                    PlayerUiState.Loading -> Unit
+                }
+            }
         }
+    }
 
-        val backButton = findViewById<ImageButton>(R.id.back_button3)
-        backButton.setOnClickListener {
+    private fun setupClickListeners() {
+        playPauseButton.setOnClickListener { viewModel.togglePlayPause() }
+        likeButton.setOnClickListener { viewModel.toggleLike() }
+        findViewById<ImageButton>(R.id.back_button3).setOnClickListener {
             viewModel.release()
             finish()
         }
@@ -136,7 +128,7 @@ class MediaActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.playState.value == true) {
+        if ((viewModel.uiState.value as? PlayerUiState.Content)?.isPlaying == true) {
             viewModel.togglePlayPause()
         }
     }
@@ -144,5 +136,9 @@ class MediaActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.release()
+    }
+
+    private fun showError(message: String) {
+        // Реализация показа ошибки
     }
 }

@@ -1,10 +1,8 @@
 package com.example.playlistmaker.data.repository
 
-import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import com.example.playlistmaker.domain.repository.AudioPlayer
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class AudioPlayerImpl @Inject constructor(
@@ -13,24 +11,38 @@ class AudioPlayerImpl @Inject constructor(
     private var mediaPlayer: MediaPlayer? = null
     private var onCompletionListener: (() -> Unit)? = null
 
-    override fun prepare(url: String, onPrepared: () -> Unit, onError: () -> Unit) {
+    override fun prepare(
+        url: String,
+        onPrepared: () -> Unit,
+        onError: () -> Unit
+    ) {
+        // Всегда освобождаем старый плеер перед новым
         release()
+
         try {
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(url)
-                prepareAsync() // ⚠️ Важно: асинхронная подготовка
+                prepareAsync()
+
                 setOnPreparedListener {
-                    Log.d("AudioPlayer", "MediaPlayer prepared") // Логируем успех
+                    Log.d("AudioPlayer", "MediaPlayer prepared")
                     onPrepared()
                 }
+
                 setOnErrorListener { _, what, extra ->
-                    Log.e("AudioPlayer", "Error: what=$what, extra=$extra") // Логируем ошибку
+                    Log.e("AudioPlayer", "MediaPlayer error: what=$what, extra=$extra")
                     onError()
                     true
                 }
+
+                // **Важно**: при завершении трека вызываем сохранённый внешний коллбэк
+                setOnCompletionListener {
+                    Log.d("AudioPlayer", "MediaPlayer completed")
+                    onCompletionListener?.invoke()
+                }
             }
         } catch (e: Exception) {
-            Log.e("AudioPlayer", "Exception: ${e.message}") // Логируем исключение
+            Log.e("AudioPlayer", "Error preparing MediaPlayer", e)
             onError()
         }
     }
@@ -42,7 +54,6 @@ class AudioPlayerImpl @Inject constructor(
     override fun pause() {
         mediaPlayer?.pause()
     }
-
 
     override fun seekTo(position: Int) {
         mediaPlayer?.seekTo(position)
