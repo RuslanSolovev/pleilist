@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.utils.SettingsEvent
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,72 +28,89 @@ class SettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
+        setupWindowInsets()
+        setupThemeSwitch()
+        setupClickListeners()
+        observeEvents()
+    }
+
+    private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.setting)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
 
+    private fun setupThemeSwitch() {
         val themeSwitch = findViewById<Switch>(R.id.theme_switch)
+        themeSwitch.isChecked = viewModel.getCurrentTheme() //
 
-        // Подписка на LiveData — делаем Intent при получении события
-        viewModel.shareAppEvent.observe(this) { shareText ->
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareText)
-            }
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.podel_cherez)))
-        }
-
-        // Подписка на изменение темы
-        viewModel.darkThemeEnabled.observe(this) { isDark ->
-            if (themeSwitch.isChecked != isDark) {
-                themeSwitch.isChecked = isDark
-            }
-            // Применяем тему в приложении
-            AppCompatDelegate.setDefaultNightMode(
-                if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            )
-        }
-
-        // Обработка переключения тумблера темы
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked != viewModel.darkThemeEnabled.value) {
-                viewModel.toggleTheme()
-            }
+            viewModel.updateTheme(isChecked) //
+            applyTheme(isChecked)
         }
+    }
 
-        // Назад
+    private fun applyTheme(isDark: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+    }
+
+    private fun setupClickListeners() {
         findViewById<ImageButton>(R.id.back_button).setOnClickListener {
             finish()
         }
 
-        // Поделиться — ViewModel обрабатывает
         findViewById<LinearLayout>(R.id.share_button).setOnClickListener {
-            viewModel.onShareClicked()
+            viewModel.shareApp()
         }
 
-        // Поддержка
         findViewById<LinearLayout>(R.id.support_button).setOnClickListener {
-            sendEmail()
+            viewModel.contactSupport()
         }
 
-        // Условия использования
         findViewById<LinearLayout>(R.id.terms_button).setOnClickListener {
-            openTermsAndConditions()
+            viewModel.openTerms()
         }
     }
 
-    private fun sendEmail() {
-        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:solovevrus1993@gmail.com")
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.soobchenie_razrab))
+    private fun observeEvents() {
+        viewModel.event.observe(this) { event ->
+            when (event) {
+                is SettingsEvent.Share -> handleShare(event.text)
+                is SettingsEvent.Support -> handleSupport(event.intent, event.errorMessage)
+                is SettingsEvent.Terms -> handleTerms(event.url)
+            }
         }
-        startActivity(emailIntent)
     }
 
-    private fun openTermsAndConditions() {
-        val termsUrl = "https://yandex.ru/legal/practicum_offer/"
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(termsUrl)))
+    private fun handleShare(text: String) {
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }.let { startActivity(Intent.createChooser(it, getString(R.string.share_via))) }
+    }
+
+    private fun handleSupport(intent: Intent, errorMessage: String) {
+        try {
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleTerms(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: Exception) {
+            Toast.makeText(this, "Cannot open browser", Toast.LENGTH_SHORT).show()
+        }
     }
 }

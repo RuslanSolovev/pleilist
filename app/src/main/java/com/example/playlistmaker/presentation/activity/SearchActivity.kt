@@ -1,12 +1,14 @@
 package com.example.playlistmaker.presentation.activity
 
-import android.content.*
+import android.content.Context
 import android.graphics.Rect
-import android.os.*
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
-import android.view.inputmethod.*
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -14,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.presentation.SearchState
 import com.example.playlistmaker.presentation.SearchViewModel
@@ -81,28 +82,16 @@ class SearchActivity : AppCompatActivity() {
             render(state)
         }
 
-        viewModel.history.observe(this) { history ->
-            if (history.isNotEmpty()) {
-                historyHeader.isVisible = true
-                historyRecyclerView.isVisible = true
-                recyclerView.isVisible = false
-                clearHistoryButton.isVisible = true
-                historyAdapter.updateTracks(history)
+        savedInstanceState?.getString(SEARCH_QUERY_KEY)?.let { query ->
+            searchEditText.setText(query)
+            if (query.isNotEmpty()) {
+                clearButton.isVisible = true
+                viewModel.searchDebounced(query)
             } else {
-                hideHistory()
-            }
-        }
-
-        savedInstanceState?.getString(SEARCH_QUERY_KEY)?.let {
-            searchEditText.setText(it)
-            if (it.isNotEmpty()) {
-                clearButton.visibility = View.VISIBLE
-                viewModel.searchDebounced(it)
-            } else {
-                viewModel.loadHistory()
+                viewModel.restoreState()
             }
         } ?: run {
-            viewModel.loadHistory()
+            viewModel.restoreState()
         }
     }
 
@@ -136,8 +125,7 @@ class SearchActivity : AppCompatActivity() {
                 val query = s.toString()
                 if (query.isEmpty()) {
                     clearButton.isVisible = false
-                    // Удаляем ручное управление UI, пусть ViewModel решает что показывать
-                    viewModel.searchDebounced("") // Пустая строка переведет в состояние ShowHistory
+                    viewModel.searchDebounced("")
                 } else {
                     clearButton.isVisible = true
                     viewModel.searchDebounced(query)
@@ -189,45 +177,33 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchEditText.text.isEmpty()) viewModel.loadHistory()
+            if (hasFocus && searchEditText.text.isEmpty()) {
+                viewModel.restoreState()
+            }
         }
     }
-    private fun showHistory() {
-        val history = viewModel.history.value ?: emptyList()
-        if (history.isNotEmpty()) {
-            historyAdapter.updateTracks(history)
-            historyRecyclerView.isVisible = true
-            historyHeader.isVisible = true
-            clearHistoryButton.isVisible = true
-        } else {
-            hideHistory()
-        }
-    }
-
-
-
 
     private fun render(state: SearchState) {
         when (state) {
             is SearchState.Loading -> {
                 placeholderRenderer.showLoading()
                 recyclerView.isVisible = false
-                hideHistory()
                 progressBar.isVisible = true
+                hideHistory()
             }
 
             is SearchState.NoResults -> {
                 placeholderRenderer.showNoResults()
                 recyclerView.isVisible = false
-                hideHistory()
                 progressBar.isVisible = false
+                hideHistory()
             }
 
             is SearchState.Error -> {
                 placeholderRenderer.showError()
                 recyclerView.isVisible = false
-                hideHistory()
                 progressBar.isVisible = false
+                hideHistory()
             }
 
             is SearchState.Success -> {
@@ -238,29 +214,33 @@ class SearchActivity : AppCompatActivity() {
                 hideHistory()
             }
 
-            is SearchState.Empty -> {
-                placeholderRenderer.hidePlaceholder()
-                trackAdapter.updateTracks(emptyList())
-                progressBar.isVisible = false
-                recyclerView.isVisible = false
-                hideHistory()
-            }
-
             is SearchState.ShowHistory -> {
-                placeholderRenderer.hidePlaceholder()
-                recyclerView.isVisible = false
-                progressBar.isVisible = false
-                showHistory()
+                if (searchEditText.text.isEmpty()) {
+                    placeholderRenderer.hidePlaceholder()
+                    recyclerView.isVisible = false
+                    progressBar.isVisible = false
+                    showHistory(state.history)
+                }
             }
 
+            else -> {}
+        }
+    }
 
-    else -> {}
+    private fun showHistory(history: List<Track>) {
+        if (history.isNotEmpty()) {
+            historyAdapter.updateTracks(history)
+            historyRecyclerView.isVisible = true
+            historyHeader.isVisible = true
+            clearHistoryButton.isVisible = true
+        } else {
+            hideHistory()
         }
     }
 
     private fun hideHistory() {
-        historyHeader.isVisible = false
         historyRecyclerView.isVisible = false
+        historyHeader.isVisible = false
         clearHistoryButton.isVisible = false
     }
 
@@ -282,10 +262,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (searchEditText.text.isEmpty()) {
-            viewModel.loadHistory()
-
-        }
-        viewModel.restoreSearch()
+        viewModel.restoreState()
     }
 }

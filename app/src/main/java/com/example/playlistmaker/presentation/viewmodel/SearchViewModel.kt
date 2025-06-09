@@ -19,43 +19,33 @@ class SearchViewModel(
     }
 
     private var searchJob: Job? = null
-    private var currentQuery: String? = null
+    private var currentQuery: String = ""
     private var currentResults: List<Track> = emptyList()
+    private var isHistoryShowing: Boolean = false
 
     private val _state = MutableLiveData<SearchState>()
     val state: LiveData<SearchState> = _state
 
-    private val _history = MutableLiveData<List<Track>>(emptyList())
-    val history: LiveData<List<Track>> = _history
-
-    /**
-     * Запускает поиск с дебаунсом
-     */
     fun searchDebounced(query: String) {
         currentQuery = query
         searchJob?.cancel()
+
         if (query.isEmpty()) {
-            _state.postValue(SearchState.ShowHistory)
+            showHistoryIfNeeded()
             return
         }
+
+        isHistoryShowing = false
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_DELAY)
             performSearch(query)
         }
     }
 
-    /**
-     * Повтор поиска текущего запроса
-     */
     fun retry() {
-        currentQuery?.let {
-            performSearch(it)
-        }
+        performSearch(currentQuery)
     }
 
-    /**
-     * Выполнение поиска и сохранение результатов
-     */
     private fun performSearch(query: String) {
         _state.postValue(SearchState.Loading)
         viewModelScope.launch(Dispatchers.IO) {
@@ -73,61 +63,55 @@ class SearchViewModel(
         }
     }
 
-    /**
-     * Восстановление предыдущего состояния поиска при возврате на экран
-     */
-    fun restoreSearch() {
-        if (currentQuery.isNullOrEmpty()) {
-            loadHistory()
-            _state.value = SearchState.ShowHistory // Используем value вместо postValue, так как в главном потоке
+    fun restoreState() {
+        if (currentQuery.isEmpty()) {
+            showHistoryIfNeeded()
         } else {
             if (currentResults.isNotEmpty()) {
                 _state.value = SearchState.Success(currentResults)
             } else {
-                // Если есть запрос, но нет результатов - показываем пустое состояние
-                _state.value = SearchState.Empty
+                performSearch(currentQuery)
             }
         }
     }
 
-    /**
-     * Загрузка истории поиска
-     */
-    fun loadHistory() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val historyList = historyInteractor.getHistory()
-            _history.postValue(historyList)
+    private fun showHistoryIfNeeded() {
+        if (currentQuery.isEmpty()) {
+            isHistoryShowing = true
+            loadHistory()
         }
     }
 
-    /**
-     * Очистка истории поиска
-     */
+    private fun loadHistory() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val historyList = historyInteractor.getHistory()
+            if (isHistoryShowing) {
+                _state.postValue(SearchState.ShowHistory(historyList))
+            }
+        }
+    }
+
     fun clearHistory() {
         viewModelScope.launch(Dispatchers.IO) {
             historyInteractor.clearHistory()
-            _history.postValue(emptyList())
+            if (isHistoryShowing) {
+                _state.postValue(SearchState.ShowHistory(emptyList()))
+            }
         }
     }
 
-    /**
-     * Сохранение трека в историю: удаление дубликатов и лимит 10
-     */
     fun saveTrackToHistory(track: Track) {
         viewModelScope.launch(Dispatchers.IO) {
             historyInteractor.saveTrack(track)
-            val updatedHistory = historyInteractor.getHistory()
-            _history.postValue(updatedHistory)
+            // Не обновляем UI здесь, чтобы избежать мигания
         }
     }
 }
 
 sealed class SearchState {
-
-    object ShowHistory : SearchState()
     object Loading : SearchState()
     object NoResults : SearchState()
     object Error : SearchState()
-    object Empty : SearchState()
     data class Success(val tracks: List<Track>) : SearchState()
+    data class ShowHistory(val history: List<Track>) : SearchState()
 }
