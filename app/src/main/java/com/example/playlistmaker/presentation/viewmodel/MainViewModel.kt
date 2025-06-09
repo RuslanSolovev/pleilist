@@ -2,12 +2,9 @@ package com.example.playlistmaker.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
-    private val themeInteractor: ThemeInteractor
-) : ViewModel() {
-
+class MainViewModel : ViewModel(), KoinComponent {
+    private val themeInteractor: ThemeInteractor by inject()
 }

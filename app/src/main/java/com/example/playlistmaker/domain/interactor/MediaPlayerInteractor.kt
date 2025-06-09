@@ -45,5 +45,9 @@ class MediaPlayerInteractor(
             isPlaying = false
             listener()
         }
+
+        fun isPrepared(): Boolean {
+            return audioPlayerInteractor.getDuration() > 0
+        }
     }
 }

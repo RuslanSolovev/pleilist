@@ -3,9 +3,9 @@ package com.example.playlistmaker.data.repository
 import android.media.MediaPlayer
 import android.util.Log
 import com.example.playlistmaker.domain.repository.AudioPlayer
-import javax.inject.Inject
 
-class AudioPlayerImpl @Inject constructor(
+
+class AudioPlayerImpl (
 ) : AudioPlayer {
 
     private var mediaPlayer: MediaPlayer? = null
