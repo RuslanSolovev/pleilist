@@ -2,6 +2,7 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import com.example.playlistmaker.data.dto.ItunesApiService
 import com.example.playlistmaker.data.interactor.*
 import com.example.playlistmaker.data.repository.*
@@ -48,7 +49,9 @@ val repositoryModule = module {
 
     single<LikeRepository> { LikeRepositoryImpl(get()) }
 
-    single<AudioPlayer> { AudioPlayerImpl() }
+    single<MediaPlayer> { MediaPlayer() } // Добавлено создание MediaPlayer
+
+    single<AudioPlayer> { AudioPlayerImpl(get()) } // Передаем MediaPlayer в конструктор
 
     single { Gson() }
 }
