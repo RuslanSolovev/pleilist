@@ -4,9 +4,9 @@ package com.example.playlistmaker.data.repository
 import android.content.SharedPreferences
 import com.example.playlistmaker.domain.repositories.LikeRepository
 
-import javax.inject.Inject
 
-class LikeRepositoryImpl @Inject constructor(
+
+class LikeRepositoryImpl(
     private val sharedPreferences: SharedPreferences
 ) : LikeRepository {
 

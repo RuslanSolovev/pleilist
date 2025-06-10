@@ -12,7 +12,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
@@ -23,6 +22,7 @@ import com.example.playlistmaker.presentation.adapter.TrackAdapter
 import com.example.playlistmaker.presentation.ui.ClickDebounceHelper
 import com.example.playlistmaker.presentation.ui.PlaceholderRenderer
 import com.example.playlistmaker.presentation.ui.TrackNavigator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -42,18 +42,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var trackNavigator: TrackNavigator
     private lateinit var placeholderRenderer: PlaceholderRenderer
 
-    private val viewModel: SearchViewModel by lazy {
-        ViewModelProvider(
-            this,
-            object : ViewModelProvider.Factory {
-                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                    val searchInteractor = Creator.provideSearchInteractor(applicationContext)
-                    val historyInteractor = Creator.provideHistoryInteractor(applicationContext)
-                    return SearchViewModel(searchInteractor, historyInteractor) as T
-                }
-            }
-        )[SearchViewModel::class.java]
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
@@ -78,7 +67,8 @@ class SearchActivity : AppCompatActivity() {
             retryButton
         )
 
-        viewModel.state.observe(this) { state ->
+        // Наблюдение за состоянием через LiveData
+        viewModel.state.observe(this@SearchActivity) { state ->
             render(state)
         }
 
@@ -185,27 +175,24 @@ class SearchActivity : AppCompatActivity() {
 
     private fun render(state: SearchState) {
         when (state) {
-            is SearchState.Loading -> {
+            SearchState.Loading -> {
                 placeholderRenderer.showLoading()
                 recyclerView.isVisible = false
                 progressBar.isVisible = true
                 hideHistory()
             }
-
-            is SearchState.NoResults -> {
+            SearchState.NoResults -> {
                 placeholderRenderer.showNoResults()
                 recyclerView.isVisible = false
                 progressBar.isVisible = false
                 hideHistory()
             }
-
-            is SearchState.Error -> {
+            SearchState.Error -> {
                 placeholderRenderer.showError()
                 recyclerView.isVisible = false
                 progressBar.isVisible = false
                 hideHistory()
             }
-
             is SearchState.Success -> {
                 placeholderRenderer.hidePlaceholder()
                 trackAdapter.updateTracks(state.tracks)
@@ -213,7 +200,6 @@ class SearchActivity : AppCompatActivity() {
                 recyclerView.isVisible = true
                 hideHistory()
             }
-
             is SearchState.ShowHistory -> {
                 if (searchEditText.text.isEmpty()) {
                     placeholderRenderer.hidePlaceholder()
@@ -221,6 +207,9 @@ class SearchActivity : AppCompatActivity() {
                     progressBar.isVisible = false
                     showHistory(state.history)
                 }
+            }
+            SearchState.Default -> {
+                // Initial state, do nothing
             }
 
             else -> {}

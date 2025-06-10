@@ -5,23 +5,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.MediaPlayerInteractor
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.presentation.player.PlayerUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MediaViewModel @Inject constructor(
+class MediaViewModel(
     private val mediaPlayerInteractor: MediaPlayerInteractor,
     private val toggleLikeUseCase: ToggleLikeUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PlayerUiState>(PlayerUiState.Content())
-    val uiState: StateFlow<PlayerUiState> = _uiState
+    val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
     private var currentTrackId = -1
     private var timeUpdateJob: Job? = null

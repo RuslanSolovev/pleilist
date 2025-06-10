@@ -16,12 +16,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
 import com.example.playlistmaker.presentation.utils.SettingsEvent
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
 
-    private val viewModel: SettingsViewModel by viewModels()
+    private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +43,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupThemeSwitch() {
         val themeSwitch = findViewById<Switch>(R.id.theme_switch)
-        themeSwitch.isChecked = viewModel.getCurrentTheme() //
+        themeSwitch.isChecked = viewModel.getCurrentTheme()
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateTheme(isChecked) //
+            viewModel.updateTheme(isChecked)
             applyTheme(isChecked)
         }
     }

@@ -1,13 +1,9 @@
-// ThemeInteractorImpl.kt в data/interactor
 package com.example.playlistmaker.data.interactor
 
 import android.content.SharedPreferences
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ThemeInteractorImpl @Inject constructor(
+class ThemeInteractorImpl(
     private val sharedPreferences: SharedPreferences
 ) : ThemeInteractor {
 

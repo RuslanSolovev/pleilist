@@ -1,13 +1,13 @@
 package com.example.playlistmaker.presentation
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractor
 import com.example.playlistmaker.domain.model.Track
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
@@ -47,16 +47,16 @@ class SearchViewModel(
     }
 
     private fun performSearch(query: String) {
-        _state.postValue(SearchState.Loading)
+        _state.value = SearchState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = searchInteractor.execute(query)
                 currentResults = result
-                if (result.isEmpty()) {
-                    _state.postValue(SearchState.NoResults)
+                _state.postValue(if (result.isEmpty()) {
+                    SearchState.NoResults
                 } else {
-                    _state.postValue(SearchState.Success(result))
-                }
+                    SearchState.Success(result)
+                })
             } catch (e: Exception) {
                 _state.postValue(SearchState.Error)
             }
@@ -103,12 +103,12 @@ class SearchViewModel(
     fun saveTrackToHistory(track: Track) {
         viewModelScope.launch(Dispatchers.IO) {
             historyInteractor.saveTrack(track)
-            // Не обновляем UI здесь, чтобы избежать мигания
         }
     }
 }
 
 sealed class SearchState {
+    object Default : SearchState()
     object Loading : SearchState()
     object NoResults : SearchState()
     object Error : SearchState()

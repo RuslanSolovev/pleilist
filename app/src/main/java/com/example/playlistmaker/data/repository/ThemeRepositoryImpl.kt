@@ -4,11 +4,10 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.playlistmaker.domain.repository.ThemeRepository
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ThemeRepositoryImpl @Inject constructor(
+
+
+class ThemeRepositoryImpl (
     private val sharedPreferences: SharedPreferences
 ) : ThemeRepository {
 

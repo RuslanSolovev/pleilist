@@ -6,6 +6,7 @@ import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.HistoryInteractorImpl
 import com.example.playlistmaker.domain.interactor.SearchInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractorImpl
+import com.google.gson.Gson
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -22,6 +23,10 @@ object Creator {
         retrofit.create(ItunesApiService::class.java)
     }
 
+    private val gson: Gson by lazy {
+        Gson()
+    }
+
     fun provideSearchInteractor(context: Context): SearchInteractor {
         val repository = SearchRepositoryImpl(apiService)
         return SearchInteractorImpl(repository)
@@ -29,7 +34,7 @@ object Creator {
 
     fun provideHistoryInteractor(context: Context): HistoryInteractor {
         val sharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        val repository = HistoryRepositoryImpl(sharedPreferences)
+        val repository = HistoryRepositoryImpl(sharedPreferences, gson)
         return HistoryInteractorImpl(repository)
     }
 }
