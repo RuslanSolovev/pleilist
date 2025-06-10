@@ -4,9 +4,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.example.playlistmaker.domain.repository.AudioPlayer
 
-
-class AudioPlayerImpl (
-) : AudioPlayer {
+class AudioPlayerImpl : AudioPlayer {
 
     private var mediaPlayer: MediaPlayer? = null
     private var onCompletionListener: (() -> Unit)? = null
@@ -16,11 +14,10 @@ class AudioPlayerImpl (
         onPrepared: () -> Unit,
         onError: () -> Unit
     ) {
-        // Всегда освобождаем старый плеер перед новым
         release()
 
         try {
-            mediaPlayer = MediaPlayer().apply {
+            mediaPlayer = createMediaPlayer().apply {
                 setDataSource(url)
                 prepareAsync()
 
@@ -35,7 +32,6 @@ class AudioPlayerImpl (
                     true
                 }
 
-                // **Важно**: при завершении трека вызываем сохранённый внешний коллбэк
                 setOnCompletionListener {
                     Log.d("AudioPlayer", "MediaPlayer completed")
                     onCompletionListener?.invoke()
@@ -45,6 +41,10 @@ class AudioPlayerImpl (
             Log.e("AudioPlayer", "Error preparing MediaPlayer", e)
             onError()
         }
+    }
+
+    protected open fun createMediaPlayer(): MediaPlayer {
+        return MediaPlayer()
     }
 
     override fun start() {
@@ -74,6 +74,7 @@ class AudioPlayerImpl (
     override fun release() {
         mediaPlayer?.release()
         mediaPlayer = null
+        onCompletionListener = null
     }
 
     override fun setOnCompletionListener(listener: () -> Unit) {

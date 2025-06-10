@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken
 
 class HistoryRepositoryImpl(
     private val prefs: SharedPreferences,
-    private val gson: Gson = Gson()
+    private val gson: Gson
 ) : HistoryRepository {
 
     private val KEY = "search_history"

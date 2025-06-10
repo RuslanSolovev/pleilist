@@ -7,13 +7,12 @@ import com.example.playlistmaker.data.interactor.*
 import com.example.playlistmaker.data.repository.*
 import com.example.playlistmaker.domain.interactor.*
 import com.example.playlistmaker.domain.repositories.LikeRepository
-import com.example.playlistmaker.domain.repository.AudioPlayer
-import com.example.playlistmaker.domain.repository.HistoryRepository
-import com.example.playlistmaker.domain.repository.SearchRepository
+import com.example.playlistmaker.domain.repository.*
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.SearchViewModel
 import com.example.playlistmaker.presentation.viewmodel.*
+import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -40,11 +39,18 @@ val repositoryModule = module {
         androidContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
     }
 
-    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    single<HistoryRepository> {
+        HistoryRepositoryImpl(
+            prefs = get(),
+            gson = get()
+        )
+    }
 
     single<LikeRepository> { LikeRepositoryImpl(get()) }
 
     single<AudioPlayer> { AudioPlayerImpl() }
+
+    single { Gson() }
 }
 
 val interactorModule = module {
@@ -71,7 +77,7 @@ val interactorModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel() }
+    viewModel { MainViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
     viewModel { MediaViewModel(get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
