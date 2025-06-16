@@ -1,16 +1,14 @@
 package com.example.playlistmaker.domain.interactor
 
 import com.example.playlistmaker.domain.repository.AudioPlayer
-import javax.inject.Inject
 
-class AudioPlayerInteractor @Inject constructor(
+class AudioPlayerInteractor(
     private val audioPlayer: AudioPlayer
 ) {
     private var isPrepared = false
     private var isPlaying = false
     private var trackUrl: String? = null
 
-    // Единственный внешний коллбэк для уведомления об окончании трека
     private var onCompletionListener: (() -> Unit)? = null
 
     fun updateTrackUrl(newUrl: String) {
@@ -37,7 +35,6 @@ class AudioPlayerInteractor @Inject constructor(
             }
         )
 
-        // Регистрируем слушатель окончания воспроизведения только один раз
         audioPlayer.setOnCompletionListener {
             isPlaying = false
             audioPlayer.seekTo(0)

@@ -5,7 +5,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -13,14 +12,13 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.viewmodel.MediaViewModel
 import com.example.playlistmaker.presentation.player.PlayerUiState
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MediaViewModel
+    private val viewModel: MediaViewModel by viewModel()
     private lateinit var currentTimeTextView: TextView
     private lateinit var playPauseButton: ImageView
     private lateinit var likeButton: ImageView
@@ -29,8 +27,6 @@ class MediaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
-
-        viewModel = ViewModelProvider(this)[MediaViewModel::class.java]
 
         currentTimeTextView = findViewById(R.id.otzet_vremy)
         playPauseButton = findViewById(R.id.imageView)

@@ -8,11 +8,8 @@ import com.example.playlistmaker.domain.interactor.SupportInteractor
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
 import com.example.playlistmaker.presentation.utils.SettingsEvent
 import com.example.playlistmaker.presentation.utils.SingleLiveEvent
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val themeInteractor: ThemeInteractor,
     private val supportInteractor: SupportInteractor
 ) : ViewModel() {

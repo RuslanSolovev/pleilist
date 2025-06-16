@@ -1,9 +1,9 @@
 package com.example.playlistmaker.domain.usecase
 
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
-import javax.inject.Inject
 
-class GetThemeUseCase @Inject constructor(
+
+class GetThemeUseCase (
     private val interactor: ThemeInteractor
 ) {
     operator fun invoke(): Boolean {

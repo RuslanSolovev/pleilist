@@ -3,12 +3,11 @@ package com.example.playlistmaker.data.repository
 import android.media.MediaPlayer
 import android.util.Log
 import com.example.playlistmaker.domain.repository.AudioPlayer
-import javax.inject.Inject
 
-class AudioPlayerImpl @Inject constructor(
+class AudioPlayerImpl(
+    private val mediaPlayer: MediaPlayer
 ) : AudioPlayer {
 
-    private var mediaPlayer: MediaPlayer? = null
     private var onCompletionListener: (() -> Unit)? = null
 
     override fun prepare(
@@ -16,11 +15,11 @@ class AudioPlayerImpl @Inject constructor(
         onPrepared: () -> Unit,
         onError: () -> Unit
     ) {
-        // Всегда освобождаем старый плеер перед новым
         release()
 
         try {
-            mediaPlayer = MediaPlayer().apply {
+            mediaPlayer.apply {
+                reset() // Сбрасываем состояние перед повторным использованием
                 setDataSource(url)
                 prepareAsync()
 
@@ -35,7 +34,6 @@ class AudioPlayerImpl @Inject constructor(
                     true
                 }
 
-                // **Важно**: при завершении трека вызываем сохранённый внешний коллбэк
                 setOnCompletionListener {
                     Log.d("AudioPlayer", "MediaPlayer completed")
                     onCompletionListener?.invoke()
@@ -48,35 +46,38 @@ class AudioPlayerImpl @Inject constructor(
     }
 
     override fun start() {
-        mediaPlayer?.start()
+        mediaPlayer.start()
     }
 
     override fun pause() {
-        mediaPlayer?.pause()
+        mediaPlayer.pause()
     }
 
     override fun seekTo(position: Int) {
-        mediaPlayer?.seekTo(position)
+        mediaPlayer.seekTo(position)
     }
 
     override fun getCurrentPosition(): Int {
-        return mediaPlayer?.currentPosition ?: 0
+        return mediaPlayer.currentPosition
     }
 
     override fun getDuration(): Int {
-        return mediaPlayer?.duration ?: 0
+        return mediaPlayer.duration
     }
 
     override fun isPlaying(): Boolean {
-        return mediaPlayer?.isPlaying == true
+        return mediaPlayer.isPlaying
     }
 
     override fun release() {
-        mediaPlayer?.release()
-        mediaPlayer = null
+        mediaPlayer.reset()
+        onCompletionListener = null
     }
 
     override fun setOnCompletionListener(listener: () -> Unit) {
         onCompletionListener = listener
+        mediaPlayer.setOnCompletionListener {
+            listener()
+        }
     }
 }
