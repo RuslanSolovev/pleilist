@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -12,6 +13,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.viewmodel.MediaViewModel
 import com.example.playlistmaker.presentation.player.PlayerUiState
+import com.example.playlistmaker.presentation.ui.activity.MediaLibraryActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -23,6 +25,7 @@ class MediaActivity : AppCompatActivity() {
     private lateinit var playPauseButton: ImageView
     private lateinit var likeButton: ImageView
     private var trackId: Int = 0
+    private lateinit var mediatekaButton: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +34,7 @@ class MediaActivity : AppCompatActivity() {
         currentTimeTextView = findViewById(R.id.otzet_vremy)
         playPauseButton = findViewById(R.id.imageView)
         likeButton = findViewById(R.id.imageView3)
+        mediatekaButton = findViewById(R.id.mediateka) // Инициализация кнопки "mediateka"
 
         trackId = intent.getIntExtra("TRACK_ID", 0)
         val trackName = intent.getStringExtra("TRACK_NAME")
@@ -42,6 +46,7 @@ class MediaActivity : AppCompatActivity() {
         val country = intent.getStringExtra("COUNTRY")
         val trackTimeMillis = intent.getLongExtra("TRACK_TIME_MILLIS", 0L)
         val previewUrl = intent.getStringExtra("PREVIEW_URL")
+
 
         viewModel.setTrackId(trackId)
         previewUrl?.let { viewModel.preparePlayer(it) }
@@ -59,6 +64,11 @@ class MediaActivity : AppCompatActivity() {
 
         setupObservers()
         setupClickListeners()
+
+        mediatekaButton.setOnClickListener {
+            val intent = Intent(this, MediaLibraryActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupObservers() {

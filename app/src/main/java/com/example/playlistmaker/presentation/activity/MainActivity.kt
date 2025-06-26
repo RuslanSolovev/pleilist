@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.ui.activity.MediaLibraryActivity
 import com.example.playlistmaker.presentation.viewmodel.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -36,8 +37,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_poisk).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
-        findViewById<Button>(R.id.button_musika).setOnClickListener {
-            startActivity(Intent(this, MediaActivity::class.java))
+        findViewById<Button>(R.id.mediateka).setOnClickListener {
+            startActivity(Intent(this, MediaLibraryActivity::class.java))
         }
         findViewById<Button>(R.id.button_nastroi).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))

@@ -47,7 +47,7 @@
             />
 
         <Button
-            android:id="@+id/button_musika"
+            android:id="@+id/mediateka"
             android:text="@string/button_musika"
             app:icon="@drawable/muzika"
             style="@style/knopki_glavnoe_meny"
