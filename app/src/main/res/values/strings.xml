@@ -40,6 +40,18 @@
     <string name="cant_open_terms">Не удалось открыть условия использования</string>
 
 
+    <string name="tab_playlists">Плейлисты</string>
+    <string name="tab_favorites">Избранные треки</string>
+    <!-- Экран "Медиатека" -->
+    <string name="media_library_title">Медиатека</string>
+
+    <!-- Заглушки -->
+    <string name="no_favorites_placeholder">Ваша медиатека пуста</string>
+    <string name="no_playlists_placeholder">Вы не создали\nни одного плейлиста</string>
+
+    <!-- Кнопка -->
+    <string name="create_playlist">Новый плейлист</string>
+
 
 </resources>
 

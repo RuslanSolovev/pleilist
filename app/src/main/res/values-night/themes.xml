@@ -62,12 +62,14 @@
     <style name="obnovit_rnopka" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/obnovit_rnopka_shape</item>
         <item name="backgroundTint">@color/white</item> <!-- Цвет фона -->
-        <item name="android:textColor">@color/chernii</item> <!-- Цвет текста -->
+        <item name="tabIndicatorColor">@color/white</item> <!-- Цвет текста -->
+        <item name="android:textColor">@color/chernii</item>
     </style>
 
     <style name="obnovit_rnopka_shape">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">54dp</item> <!-- Закругление углов -->
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="text_zagluhka">
@@ -84,6 +86,13 @@
 
     <style name="progres_bar">
         <item name="android:indeterminateTint">@color/sinii</item>
+    </style>
+
+    <style name="liniy_vkladka">
+        <item name="tabIndicatorColor">@color/white</item> <!-- Цвет текста -->
+        <item name="android:textColor">@color/chernii</item>
+        <item name="tabTextColor">@color/white</item> <!-- Цвет неактивного текста -->
+        <item name="tabSelectedTextColor">@color/white</item> <!-- Цвет активного текста -->
     </style>
 
 </resources>
