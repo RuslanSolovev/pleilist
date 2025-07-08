@@ -95,4 +95,10 @@
         <item name="tabSelectedTextColor">@color/white</item> <!-- Цвет активного текста -->
     </style>
 
+    <style name="BottomNavigationTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@drawable/nav_icon_color_selector</item>
+        <item name="itemTextColor">@drawable/nav_icon_color_selector</item>
+        <item name="android:background">@color/white</item> <!-- Только фон -->
+    </style>
+
 </resources>

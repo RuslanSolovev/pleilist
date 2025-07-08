@@ -15,5 +15,11 @@
         <item name="android:indeterminateTint">@color/sinii</item>
     </style>
 
+    <style name="BottomNavigationTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@drawable/nav_icon_color_selector</item>
+        <item name="itemTextColor">@drawable/nav_icon_color_selector</item>
+        <item name="android:fillColor">@color/chernii</item>
+    </style>
+
 
 </resources>

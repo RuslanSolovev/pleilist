@@ -3,11 +3,11 @@ package com.example.playlistmaker.presentation.ui
 import android.content.Context
 import android.content.Intent
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.presentation.activity.MediaActivity
+import com.example.playlistmaker.presentation.fragments.PlayerFragment
 
 class TrackNavigator(private val context: Context) {
     fun openTrack(track: Track) {
-        val intent = Intent(context, MediaActivity::class.java).apply {
+        val intent = Intent(context, PlayerFragment::class.java).apply {
             putExtra("TRACK_ID", track.trackId)
             putExtra("TRACK_NAME", track.trackName)
             putExtra("ARTIST_NAME", track.artistName)

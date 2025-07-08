@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/searchFragment"
+        android:icon="@drawable/lupa"
+        android:title="@string/poisk" />
+
+    <item
+        android:id="@+id/mediaLibraryFragment"
+        android:icon="@drawable/muzika"
+        android:title="@string/media_library_title"
+        />
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/nastroi"
+        android:title="@string/button_nastroi"
+        />
+</menu>
