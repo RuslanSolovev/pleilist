@@ -15,9 +15,8 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,25 +31,24 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
 
-    // UI элементы
-    private var searchEditText: EditText? = null
-    private var clearButton: ImageButton? = null
-    private var recyclerView: RecyclerView? = null
-    private var placeholderView: View? = null
-    private var retryButton: View? = null
-    private var historyRecyclerView: RecyclerView? = null
-    private var historyHeader: TextView? = null
-    private var clearHistoryButton: View? = null
-    private var progressBar: ProgressBar? = null
-
-    // Адаптеры
+    private lateinit var searchEditText: EditText
+    private lateinit var clearButton: ImageButton
+    private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
+    private lateinit var placeholderView: View
+    private lateinit var retryButton: View
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var historyHeader: TextView
+    private lateinit var clearHistoryButton: View
     private lateinit var historyAdapter: TrackAdapter
+    private lateinit var progressBar: ProgressBar
 
-    // Вспомогательные классы
+    private val navController by lazy {
+        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+    }
+
     private lateinit var clickDebounce: ClickDebounceHelper
     private lateinit var placeholderRenderer: PlaceholderRenderer
-    private lateinit var navController: NavController
 
     private val viewModel: SearchViewModel by viewModel()
 
@@ -63,44 +61,41 @@ class SearchFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.activity_search, container, false)
-        initViews(view)
-        return view
+    ): View? {
+        return inflater.inflate(R.layout.activity_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-        clickDebounce = ClickDebounceHelper(CLICK_DEBOUNCE_DELAY)
-
-        placeholderRenderer = PlaceholderRenderer(
-            requireContext(),
-            placeholderView ?: return,
-            view.findViewById(R.id.placeholder_image),
-            view.findViewById(R.id.placeholder_text),
-            retryButton ?: return
-        )
-
+        initViews(view)
         setupRecyclerViews()
         setupListeners()
 
-        // Наблюдаем за состоянием ViewModel
+        clickDebounce = ClickDebounceHelper(CLICK_DEBOUNCE_DELAY)
+        placeholderRenderer = PlaceholderRenderer(
+            requireContext(),
+            placeholderView,
+            view.findViewById(R.id.placeholder_image),
+            view.findViewById(R.id.placeholder_text),
+            retryButton
+        )
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
             render(state)
         }
 
-        // Восстанавливаем состояние после поворота экрана
         savedInstanceState?.getString(SEARCH_QUERY_KEY)?.let { query ->
-            searchEditText?.setText(query)
+            searchEditText.setText(query)
             if (query.isNotEmpty()) {
-                clearButton?.visibility = View.VISIBLE
+                clearButton.visibility = View.VISIBLE
                 viewModel.searchDebounced(query)
             } else {
                 viewModel.restoreState()
             }
-        } ?: viewModel.restoreState()
+        } ?: run {
+            viewModel.restoreState()
+        }
     }
 
     private fun initViews(view: View) {
@@ -114,40 +109,28 @@ class SearchFragment : Fragment() {
         clearHistoryButton = view.findViewById(R.id.Ochistit_Istotiy)
         progressBar = view.findViewById(R.id.progressBar)
 
-        // Скрываем кнопку назад, если она не нужна
-        view.findViewById<ImageButton>(R.id.back_button2)?.visibility = View.GONE
+        view.findViewById<ImageButton>(R.id.back_button2).visibility = View.GONE
     }
 
     private fun setupRecyclerViews() {
-        // Настройка RecyclerView для результатов поиска
-        recyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        trackAdapter = TrackAdapter(requireContext(), emptyList()) { track ->
-            if (clickDebounce.canClick()) {
-                handleTrackClick(track)
-            }
-        }
-        recyclerView?.adapter = trackAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        trackAdapter = TrackAdapter(requireContext(), emptyList()) { handleTrackClick(it) }
+        recyclerView.adapter = trackAdapter
 
-        // Настройка RecyclerView для истории поиска
-        historyRecyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        historyAdapter = TrackAdapter(requireContext(), emptyList()) { track ->
-            if (clickDebounce.canClick()) {
-                handleTrackClick(track)
-            }
-        }
-        historyRecyclerView?.adapter = historyAdapter
+        historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        historyAdapter = TrackAdapter(requireContext(), emptyList()) { handleTrackClick(it) }
+        historyRecyclerView.adapter = historyAdapter
     }
 
     private fun setupListeners() {
-        // Слушатель изменений текста в поле поиска
-        searchEditText?.addTextChangedListener(object : TextWatcher {
+        searchEditText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s?.toString() ?: ""
+                val query = s.toString()
                 if (query.isEmpty()) {
-                    clearButton?.visibility = View.GONE
+                    clearButton.visibility = View.GONE
                     viewModel.searchDebounced("")
                 } else {
-                    clearButton?.visibility = View.VISIBLE
+                    clearButton.visibility = View.VISIBLE
                     viewModel.searchDebounced(query)
                 }
             }
@@ -156,27 +139,24 @@ class SearchFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Кнопка очистки поиска
-        clearButton?.setOnClickListener {
-            searchEditText?.setText("")
-            searchEditText?.let { hideKeyboard(it) }
+        clearButton.setOnClickListener {
+            searchEditText.setText("")
+            hideKeyboard(searchEditText)
         }
 
-        // Кнопка повтора при ошибке
-        retryButton?.setOnClickListener {
+        retryButton.setOnClickListener {
             viewModel.retry()
         }
 
-        // Скрытие клавиатуры при касании вне поля ввода
         view?.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                activity?.currentFocus?.let { focusedView ->
-                    if (focusedView is EditText) {
+                activity?.currentFocus?.let { view ->
+                    if (view is EditText) {
                         val rect = Rect()
-                        focusedView.getGlobalVisibleRect(rect)
+                        view.getGlobalVisibleRect(rect)
                         if (!rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                            hideKeyboard(focusedView)
-                            focusedView.clearFocus()
+                            hideKeyboard(view)
+                            view.clearFocus()
                         }
                     }
                 }
@@ -184,26 +164,23 @@ class SearchFragment : Fragment() {
             false
         }
 
-        // Обработка нажатия "Поиск" на клавиатуре
-        searchEditText?.setOnEditorActionListener { _, actionId, _ ->
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = searchEditText?.text?.toString()?.trim() ?: ""
+                val query = searchEditText.text.toString().trim()
                 if (query.isNotEmpty()) {
                     viewModel.searchDebounced(query)
-                    searchEditText?.let { hideKeyboard(it) }
+                    hideKeyboard(searchEditText)
                 }
                 true
             } else false
         }
 
-        // Кнопка очистки истории
-        clearHistoryButton?.setOnClickListener {
+        clearHistoryButton.setOnClickListener {
             viewModel.clearHistory()
         }
 
-        // Обработка фокуса на поле поиска
-        searchEditText?.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchEditText?.text?.isEmpty() == true) {
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && searchEditText.text.isEmpty()) {
                 viewModel.restoreState()
             }
         }
@@ -213,34 +190,34 @@ class SearchFragment : Fragment() {
         when (state) {
             SearchState.Loading -> {
                 placeholderRenderer.showLoading()
-                recyclerView?.visibility = View.GONE
-                progressBar?.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
                 hideHistory()
             }
             SearchState.NoResults -> {
                 placeholderRenderer.showNoResults()
-                recyclerView?.visibility = View.GONE
-                progressBar?.visibility = View.GONE
+                recyclerView.visibility = View.GONE
+                progressBar.visibility = View.GONE
                 hideHistory()
             }
             SearchState.Error -> {
                 placeholderRenderer.showError()
-                recyclerView?.visibility = View.GONE
-                progressBar?.visibility = View.GONE
+                recyclerView.visibility = View.GONE
+                progressBar.visibility = View.GONE
                 hideHistory()
             }
             is SearchState.Success -> {
                 placeholderRenderer.hidePlaceholder()
                 trackAdapter.updateTracks(state.tracks)
-                progressBar?.visibility = View.GONE
-                recyclerView?.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
                 hideHistory()
             }
             is SearchState.ShowHistory -> {
-                if (searchEditText?.text?.isEmpty() == true) {
+                if (searchEditText.text.isEmpty()) {
                     placeholderRenderer.hidePlaceholder()
-                    recyclerView?.visibility = View.GONE
-                    progressBar?.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
+                    progressBar.visibility = View.GONE
                     showHistory(state.history)
                 }
             }
@@ -252,18 +229,18 @@ class SearchFragment : Fragment() {
     private fun showHistory(history: List<Track>) {
         if (history.isNotEmpty()) {
             historyAdapter.updateTracks(history)
-            historyRecyclerView?.visibility = View.VISIBLE
-            historyHeader?.visibility = View.VISIBLE
-            clearHistoryButton?.visibility = View.VISIBLE
+            historyRecyclerView.visibility = View.VISIBLE
+            historyHeader.visibility = View.VISIBLE
+            clearHistoryButton.visibility = View.VISIBLE
         } else {
             hideHistory()
         }
     }
 
     private fun hideHistory() {
-        historyRecyclerView?.visibility = View.GONE
-        historyHeader?.visibility = View.GONE
-        clearHistoryButton?.visibility = View.GONE
+        historyRecyclerView.visibility = View.GONE
+        historyHeader.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
     }
 
     private fun hideKeyboard(view: View) {
@@ -272,20 +249,9 @@ class SearchFragment : Fragment() {
     }
 
     private fun handleTrackClick(track: Track) {
-        // Проверяем, доступен ли трек для проигрывания
-        if (track.previewUrl.isNullOrEmpty()) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.preview_not_available),
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        // Сохраняем трек в историю
+        if (!clickDebounce.canClick()) return
         viewModel.saveTrackToHistory(track)
 
-        // Создаем Bundle с данными трека
         val bundle = Bundle().apply {
             putInt("TRACK_ID", track.trackId)
             putString("TRACK_NAME", track.trackName)
@@ -299,37 +265,21 @@ class SearchFragment : Fragment() {
             putString("PREVIEW_URL", track.previewUrl)
         }
 
-        // Переходим к фрагменту плеера
         try {
             navController.navigate(R.id.action_searchFragment_to_playerFragment, bundle)
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
+            // Обработка ошибки навигации
             e.printStackTrace()
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.error_opening_player),
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        searchEditText?.text?.toString()?.let {
-            outState.putString(SEARCH_QUERY_KEY, it)
-        }
+        outState.putString(SEARCH_QUERY_KEY, searchEditText.text.toString())
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // Очищаем ссылки на view для избежания утечек памяти
-        searchEditText = null
-        clearButton = null
-        recyclerView = null
-        placeholderView = null
-        retryButton = null
-        historyRecyclerView = null
-        historyHeader = null
-        clearHistoryButton = null
-        progressBar = null
+    override fun onResume() {
+        super.onResume()
+        viewModel.restoreState()
     }
 }

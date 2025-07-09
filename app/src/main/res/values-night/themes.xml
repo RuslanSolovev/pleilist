@@ -89,6 +89,7 @@
     </style>
 
     <style name="liniy_vkladka">
+        <item name="android:background">@color/chernii</item>
         <item name="tabIndicatorColor">@color/white</item> <!-- Цвет текста -->
         <item name="android:textColor">@color/chernii</item>
         <item name="tabTextColor">@color/white</item> <!-- Цвет неактивного текста -->
