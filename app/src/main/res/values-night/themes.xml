@@ -89,10 +89,17 @@
     </style>
 
     <style name="liniy_vkladka">
+        <item name="android:background">@color/chernii</item>
         <item name="tabIndicatorColor">@color/white</item> <!-- Цвет текста -->
         <item name="android:textColor">@color/chernii</item>
         <item name="tabTextColor">@color/white</item> <!-- Цвет неактивного текста -->
         <item name="tabSelectedTextColor">@color/white</item> <!-- Цвет активного текста -->
+    </style>
+
+    <style name="BottomNavigationTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@drawable/nav_icon_color_selector</item>
+        <item name="itemTextColor">@drawable/nav_icon_color_selector</item>
+        <item name="android:background">@color/white</item> <!-- Только фон -->
     </style>
 
 </resources>

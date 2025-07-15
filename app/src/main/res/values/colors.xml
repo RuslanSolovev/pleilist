@@ -22,6 +22,8 @@
     <color name="polzynok4">#9FBBF3</color>
     <color name="polzynok3">@color/sinii</color>
 
-
-
+    <!-- Цвета для BottomNavigationView -->
+    <color name="active_bottom_nav_color">#FF1E88E5</color> <!-- Синий (активный) -->
+    <color name="inactive_bottom_nav_color">#757575</color> <!-- Серый (неактивный) -->
+    <color name="qwer">#1A1B22</color>
 </resources>

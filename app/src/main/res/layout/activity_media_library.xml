@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    style="@style/background_fon">
 
     <!-- Контейнер для кнопки "Назад" и заголовка -->
     <LinearLayout
@@ -33,10 +34,11 @@
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
-            style="@style/text_zagluhka"
+            style="@style/zagolovok"
             android:layout_height="wrap_content"
             android:text="@string/media_library_title"
-            android:textSize="22sp"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/tekst_size"
             android:textStyle="bold"
             android:layout_marginStart="16dp" />
     </LinearLayout>

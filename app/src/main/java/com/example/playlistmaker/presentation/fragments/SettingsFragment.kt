@@ -1,48 +1,43 @@
-package com.example.playlistmaker.presentation.activity
+package com.example.playlistmaker.presentation.fragments
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
 import com.example.playlistmaker.presentation.utils.SettingsEvent
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
-
+class SettingsFragment : Fragment() {
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_settings, container, false)
+    }
 
-        setupWindowInsets()
-        setupThemeSwitch()
-        setupClickListeners()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupThemeSwitch(view)
+        setupClickListeners(view)
         observeEvents()
     }
 
-    private fun setupWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.setting)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-    }
-
-    private fun setupThemeSwitch() {
-        val themeSwitch = findViewById<Switch>(R.id.theme_switch)
+    private fun setupThemeSwitch(view: View) {
+        val themeSwitch = view.findViewById<Switch>(R.id.theme_switch)
         themeSwitch.isChecked = viewModel.getCurrentTheme()
 
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -58,26 +53,25 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
-    private fun setupClickListeners() {
-        findViewById<ImageButton>(R.id.back_button).setOnClickListener {
-            finish()
-        }
+    private fun setupClickListeners(view: View) {
+        // Убираем кнопку назад
+        view.findViewById<ImageButton>(R.id.back_button).visibility = View.GONE
 
-        findViewById<LinearLayout>(R.id.share_button).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.share_button).setOnClickListener {
             viewModel.shareApp()
         }
 
-        findViewById<LinearLayout>(R.id.support_button).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.support_button).setOnClickListener {
             viewModel.contactSupport()
         }
 
-        findViewById<LinearLayout>(R.id.terms_button).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.terms_button).setOnClickListener {
             viewModel.openTerms()
         }
     }
 
     private fun observeEvents() {
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observe(viewLifecycleOwner) { event ->
             when (event) {
                 is SettingsEvent.Share -> handleShare(event.text)
                 is SettingsEvent.Support -> handleSupport(event.intent, event.errorMessage)
@@ -95,13 +89,13 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun handleSupport(intent: Intent, errorMessage: String) {
         try {
-            if (intent.resolveActivity(packageManager) != null) {
+            if (intent.resolveActivity(requireActivity().packageManager) != null) {
                 startActivity(intent)
             } else {
-                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -109,7 +103,7 @@ class SettingsActivity : AppCompatActivity() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: Exception) {
-            Toast.makeText(this, "Cannot open browser", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Не удалось открыть браузер", Toast.LENGTH_SHORT).show()
         }
     }
 }

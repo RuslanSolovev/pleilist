@@ -52,6 +52,7 @@
     <!-- Кнопка -->
     <string name="create_playlist">Новый плейлист</string>
 
-
+    <string name="preview_not_available">Превью трека недоступно</string>
+    <string name="error_opening_player">Ошибка при открытии плеера</string>
 </resources>
 
