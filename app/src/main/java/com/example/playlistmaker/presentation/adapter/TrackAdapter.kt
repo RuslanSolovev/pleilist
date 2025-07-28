@@ -19,11 +19,12 @@ class TrackAdapter(
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-    // Разные радиусы для разных случаев
-    private val smallCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_small) // 2dp
-    private val bigCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_big)   // 8dp
+    private var lastClickTime = 0L
+    private val clickDebounceDelay = 1000L
 
-    // Оптимизированные настройки Glide
+    private val smallCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_small)
+    private val bigCornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_big)
+
     private val glideOptionsSmall = RequestOptions()
         .placeholder(R.drawable.placeholder)
         .error(R.drawable.placeholder)
@@ -34,7 +35,6 @@ class TrackAdapter(
         .error(R.drawable.placeholder)
         .transform(RoundedCorners(bigCornerRadius))
 
-    // Флаг для определения типа отображения
     var isLargeArtworkMode: Boolean = false
         set(value) {
             field = value
@@ -56,9 +56,13 @@ class TrackAdapter(
         holder.bind(track)
 
         holder.itemView.setOnClickListener {
-            it.isPressed = true
-            it.postDelayed({ it.isPressed = false }, 200)
-            onItemClick(track)
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime >= clickDebounceDelay) {
+                lastClickTime = currentTime
+                it.isPressed = true
+                it.postDelayed({ it.isPressed = false }, 200)
+                onItemClick(track)
+            }
         }
     }
 
@@ -82,9 +86,7 @@ class TrackAdapter(
             if (track.artworkUrl100.isNullOrEmpty()) {
                 artworkImageView.setImageResource(R.drawable.placeholder)
             } else {
-                // Выбираем настройки в зависимости от режима отображения
                 val options = if (isLargeArtworkMode) glideOptionsBig else glideOptionsSmall
-
                 Glide.with(context)
                     .load(track.artworkUrl100)
                     .apply(options)

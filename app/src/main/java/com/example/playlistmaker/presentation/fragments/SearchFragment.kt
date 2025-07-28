@@ -22,11 +22,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.presentation.SearchState
-import com.example.playlistmaker.presentation.SearchViewModel
 import com.example.playlistmaker.presentation.adapter.TrackAdapter
 import com.example.playlistmaker.presentation.ui.ClickDebounceHelper
 import com.example.playlistmaker.presentation.ui.PlaceholderRenderer
+import com.example.playlistmaker.presentation.viewmodel.SearchState
+import com.example.playlistmaker.presentation.viewmodel.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {

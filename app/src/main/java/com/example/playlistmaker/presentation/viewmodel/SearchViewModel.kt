@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation
+package com.example.playlistmaker.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,7 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractor
 import com.example.playlistmaker.domain.model.Track
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
@@ -16,9 +21,11 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private var searchJob: Job? = null
+    private var clickJob: Job? = null
     private var currentQuery: String = ""
     private var currentResults: List<Track> = emptyList()
     private var isHistoryShowing: Boolean = false
@@ -42,25 +49,34 @@ class SearchViewModel(
         }
     }
 
-    fun retry() {
-        performSearch(currentQuery)
+    fun handleTrackClickWithDebounce(track: Track) {
+        clickJob?.cancel()
+        clickJob = viewModelScope.launch {
+            delay(CLICK_DEBOUNCE_DELAY)
+            saveTrackToHistory(track)
+        }
     }
 
     private fun performSearch(query: String) {
         _state.value = SearchState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val result = searchInteractor.execute(query)
-                currentResults = result
-                _state.postValue(if (result.isEmpty()) {
-                    SearchState.NoResults
-                } else {
-                    SearchState.Success(result)
-                })
-            } catch (e: Exception) {
-                _state.postValue(SearchState.Error)
-            }
+        viewModelScope.launch {
+            searchInteractor.execute(query)
+                .catch { e ->
+                    _state.postValue(SearchState.Error)
+                }
+                .collect { result ->
+                    currentResults = result
+                    _state.postValue(if (result.isEmpty()) {
+                        SearchState.NoResults
+                    } else {
+                        SearchState.Success(result)
+                    })
+                }
         }
+    }
+
+    fun retry() {
+        performSearch(currentQuery)
     }
 
     fun restoreState() {
