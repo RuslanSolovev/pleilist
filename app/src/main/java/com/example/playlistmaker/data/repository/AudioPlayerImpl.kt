@@ -19,7 +19,7 @@ class AudioPlayerImpl(
 
         try {
             mediaPlayer.apply {
-                reset() // Сбрасываем состояние перед повторным использованием
+                reset()
                 setDataSource(url)
                 prepareAsync()
 

@@ -81,7 +81,7 @@ val interactorModule = module {
 val viewModelModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
-    viewModel { MediaViewModel(get(), get()) }
+    viewModel { MediaViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
 }
 

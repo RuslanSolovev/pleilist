@@ -17,16 +17,20 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.presentation.adapter.TrackAdapter
-import com.example.playlistmaker.presentation.ui.ClickDebounceHelper
 import com.example.playlistmaker.presentation.ui.PlaceholderRenderer
 import com.example.playlistmaker.presentation.viewmodel.SearchState
 import com.example.playlistmaker.presentation.viewmodel.SearchViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -47,13 +51,11 @@ class SearchFragment : Fragment() {
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
     }
 
-    private lateinit var clickDebounce: ClickDebounceHelper
     private lateinit var placeholderRenderer: PlaceholderRenderer
 
     private val viewModel: SearchViewModel by viewModel()
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_QUERY_KEY = "SEARCH_QUERY"
     }
 
@@ -72,7 +74,6 @@ class SearchFragment : Fragment() {
         setupRecyclerViews()
         setupListeners()
 
-        clickDebounce = ClickDebounceHelper(CLICK_DEBOUNCE_DELAY)
         placeholderRenderer = PlaceholderRenderer(
             requireContext(),
             placeholderView,
@@ -81,8 +82,10 @@ class SearchFragment : Fragment() {
             retryButton
         )
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            render(state)
+        lifecycleScope.launch {
+            viewModel.state.collect { state ->
+                render(state)
+            }
         }
 
         savedInstanceState?.getString(SEARCH_QUERY_KEY)?.let { query ->
@@ -114,11 +117,11 @@ class SearchFragment : Fragment() {
 
     private fun setupRecyclerViews() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        trackAdapter = TrackAdapter(requireContext(), emptyList()) { handleTrackClick(it) }
+        trackAdapter = TrackAdapter(requireContext()) { track -> handleTrackClick(track) }
         recyclerView.adapter = trackAdapter
 
         historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        historyAdapter = TrackAdapter(requireContext(), emptyList()) { handleTrackClick(it) }
+        historyAdapter = TrackAdapter(requireContext()) { track -> handleTrackClick(track) }
         historyRecyclerView.adapter = historyAdapter
     }
 
@@ -145,7 +148,7 @@ class SearchFragment : Fragment() {
         }
 
         retryButton.setOnClickListener {
-            viewModel.retry()
+            viewModel.retrySearch()
         }
 
         view?.setOnTouchListener { _, event ->
@@ -222,7 +225,6 @@ class SearchFragment : Fragment() {
                 }
             }
             SearchState.Default -> {}
-            else -> {}
         }
     }
 
@@ -249,8 +251,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun handleTrackClick(track: Track) {
-        if (!clickDebounce.canClick()) return
-        viewModel.saveTrackToHistory(track)
+        viewModel.handleTrackClick(track)
 
         val bundle = Bundle().apply {
             putInt("TRACK_ID", track.trackId)
@@ -268,7 +269,6 @@ class SearchFragment : Fragment() {
         try {
             navController.navigate(R.id.action_searchFragment_to_playerFragment, bundle)
         } catch (e: IllegalArgumentException) {
-            // Обработка ошибки навигации
             e.printStackTrace()
         }
     }

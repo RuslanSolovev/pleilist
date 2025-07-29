@@ -15,7 +15,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.viewmodel.MediaViewModel
-import com.example.playlistmaker.presentation.player.PlayerUiState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -114,7 +113,6 @@ class PlayerFragment : Fragment() {
         viewModel.setTrackId(trackId)
         previewUrl?.let { viewModel.preparePlayer(it) }
 
-        // Установка данных трека
         trackNameTextView.text = trackName ?: getString(R.string.unknown_track)
         artistNameTextView.text = artistName ?: getString(R.string.unknown_artist)
         albumTextView.text = collectionName ?: getString(R.string.unknown_album)
@@ -123,7 +121,6 @@ class PlayerFragment : Fragment() {
         countryTextView.text = country ?: getString(R.string.unknown_country)
         durationTextView.text = TimeFormatter.formatTrackTime(trackTimeMillis ?: 0L)
 
-        // Загрузка обложки
         if (!artworkUrl.isNullOrEmpty()) {
             val radiusInPx = resources.getDimensionPixelSize(R.dimen.corner_radius_big)
             Glide.with(this)
@@ -140,18 +137,16 @@ class PlayerFragment : Fragment() {
     private fun setupObservers() {
         lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
-                when (state) {
-                    is PlayerUiState.Content -> {
-                        currentTimeTextView.text = state.currentTime
-                        playPauseButton.setImageResource(
-                            if (state.isPlaying) R.drawable.buttonpase else R.drawable.button
-                        )
-                        likeButton.setImageResource(
-                            if (state.isLiked) R.drawable.button__4_ else R.drawable.button__3_
-                        )
-                    }
-                    is PlayerUiState.Error -> showError(state.message)
-                    PlayerUiState.Loading -> Unit
+                currentTimeTextView.text = state.currentTime
+                playPauseButton.setImageResource(
+                    if (state.isPlaying) R.drawable.buttonpase else R.drawable.button
+                )
+                likeButton.setImageResource(
+                    if (state.isLiked) R.drawable.button__4_ else R.drawable.button__3_
+                )
+
+                state.error?.let { error ->
+                    showError(error)
                 }
             }
         }
@@ -167,7 +162,7 @@ class PlayerFragment : Fragment() {
         }
 
         view.findViewById<ImageButton>(R.id.back_button3).setOnClickListener {
-            viewModel.release()
+            viewModel.releasePlayer()
             parentFragmentManager.popBackStack()
         }
     }
@@ -178,14 +173,13 @@ class PlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if ((viewModel.uiState.value as? PlayerUiState.Content)?.isPlaying == true) {
+        if (viewModel.uiState.value.isPlaying) {
             viewModel.togglePlayPause()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.release()
+        viewModel.releasePlayer()
     }
 }
-

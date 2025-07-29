@@ -1,17 +1,20 @@
 package com.example.playlistmaker.presentation.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchInteractor
 import com.example.playlistmaker.domain.model.Track
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -19,106 +22,89 @@ class SearchViewModel(
     private val historyInteractor: HistoryInteractor
 ) : ViewModel() {
 
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
-    }
+    private val _state = MutableStateFlow<SearchState>(SearchState.Default)
+    val state: StateFlow<SearchState> = _state.asStateFlow()
 
     private var searchJob: Job? = null
-    private var clickJob: Job? = null
-    private var currentQuery: String = ""
-    private var currentResults: List<Track> = emptyList()
-    private var isHistoryShowing: Boolean = false
+    private var currentQuery = ""
+    private var currentResults = emptyList<Track>()
 
-    private val _state = MutableLiveData<SearchState>()
-    val state: LiveData<SearchState> = _state
+    private val _searchQuery = MutableStateFlow("")
+    private val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    init {
+        setupSearchDebounce()
+    }
+
+    private fun setupSearchDebounce() {
+        searchQuery
+            .debounce(2000)
+            .onEach { query ->
+                if (query.isNotEmpty()) {
+                    performSearch(query)
+                } else {
+                    showHistory()
+                }
+            }
+            .catch { e -> _state.update { SearchState.Error } }
+            .launchIn(viewModelScope)
+    }
 
     fun searchDebounced(query: String) {
         currentQuery = query
-        searchJob?.cancel()
-
-        if (query.isEmpty()) {
-            showHistoryIfNeeded()
-            return
-        }
-
-        isHistoryShowing = false
-        searchJob = viewModelScope.launch {
-            delay(SEARCH_DEBOUNCE_DELAY)
-            performSearch(query)
-        }
-    }
-
-    fun handleTrackClickWithDebounce(track: Track) {
-        clickJob?.cancel()
-        clickJob = viewModelScope.launch {
-            delay(CLICK_DEBOUNCE_DELAY)
-            saveTrackToHistory(track)
-        }
+        _searchQuery.value = query
     }
 
     private fun performSearch(query: String) {
-        _state.value = SearchState.Loading
-        viewModelScope.launch {
-            searchInteractor.execute(query)
-                .catch { e ->
-                    _state.postValue(SearchState.Error)
-                }
-                .collect { result ->
-                    currentResults = result
-                    _state.postValue(if (result.isEmpty()) {
-                        SearchState.NoResults
-                    } else {
-                        SearchState.Success(result)
-                    })
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            _state.update { SearchState.Loading }
+            searchInteractor.search(query)
+                .collect { results ->
+                    currentResults = results
+                    _state.update {
+                        if (results.isEmpty()) SearchState.NoResults
+                        else SearchState.Success(results)
+                    }
                 }
         }
     }
 
-    fun retry() {
-        performSearch(currentQuery)
+    private fun showHistory() {
+        viewModelScope.launch {
+            val history = historyInteractor.getHistory()
+            _state.update { SearchState.ShowHistory(history) }
+        }
+    }
+
+    fun handleTrackClick(track: Track) {
+        viewModelScope.launch {
+            historyInteractor.saveTrack(track)
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            historyInteractor.clearHistory()
+            _state.update { SearchState.ShowHistory(emptyList()) }
+        }
     }
 
     fun restoreState() {
         if (currentQuery.isEmpty()) {
-            showHistoryIfNeeded()
+            showHistory()
         } else {
             if (currentResults.isNotEmpty()) {
-                _state.value = SearchState.Success(currentResults)
+                _state.update { SearchState.Success(currentResults) }
             } else {
                 performSearch(currentQuery)
             }
         }
     }
 
-    private fun showHistoryIfNeeded() {
-        if (currentQuery.isEmpty()) {
-            isHistoryShowing = true
-            loadHistory()
-        }
-    }
-
-    private fun loadHistory() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val historyList = historyInteractor.getHistory()
-            if (isHistoryShowing) {
-                _state.postValue(SearchState.ShowHistory(historyList))
-            }
-        }
-    }
-
-    fun clearHistory() {
-        viewModelScope.launch(Dispatchers.IO) {
-            historyInteractor.clearHistory()
-            if (isHistoryShowing) {
-                _state.postValue(SearchState.ShowHistory(emptyList()))
-            }
-        }
-    }
-
-    fun saveTrackToHistory(track: Track) {
-        viewModelScope.launch(Dispatchers.IO) {
-            historyInteractor.saveTrack(track)
+    fun retrySearch() {
+        if (currentQuery.isNotEmpty()) {
+            performSearch(currentQuery)
         }
     }
 }
