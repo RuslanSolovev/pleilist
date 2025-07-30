@@ -12,14 +12,19 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TrackAdapter(
     private val context: Context,
+    private val lifecycleScope: CoroutineScope,
     private val onItemClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     private var tracks = emptyList<Track>()
-    private var lastClickTime = 0L
+    private var lastClickJob: Job? = null
     private val clickDebounceTime = 1000L
 
     private val cornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_small)
@@ -59,9 +64,9 @@ class TrackAdapter(
             loadArtwork(track.artworkUrl100)
 
             itemView.setOnClickListener {
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastClickTime >= clickDebounceTime) {
-                    lastClickTime = currentTime
+                lastClickJob?.cancel()
+                lastClickJob = lifecycleScope.launch {
+                    delay(clickDebounceTime)
                     onItemClick(track)
                 }
             }

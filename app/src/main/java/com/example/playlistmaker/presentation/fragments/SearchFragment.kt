@@ -17,10 +17,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +30,8 @@ import com.example.playlistmaker.presentation.adapter.TrackAdapter
 import com.example.playlistmaker.presentation.ui.PlaceholderRenderer
 import com.example.playlistmaker.presentation.viewmodel.SearchState
 import com.example.playlistmaker.presentation.viewmodel.SearchViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -71,7 +73,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
-        setupRecyclerViews()
+        setupRecyclerViews(viewLifecycleOwner)
         setupListeners()
 
         placeholderRenderer = PlaceholderRenderer(
@@ -82,9 +84,12 @@ class SearchFragment : Fragment() {
             retryButton
         )
 
-        lifecycleScope.launch {
-            viewModel.state.collect { state ->
-                render(state)
+        // Наблюдаем за состоянием ViewModel с учетом жизненного цикла
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    render(state)
+                }
             }
         }
 
@@ -115,13 +120,19 @@ class SearchFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.back_button2).visibility = View.GONE
     }
 
-    private fun setupRecyclerViews() {
+    private fun setupRecyclerViews(lifecycleOwner: LifecycleOwner) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        trackAdapter = TrackAdapter(requireContext()) { track -> handleTrackClick(track) }
+        trackAdapter = TrackAdapter(
+            requireContext(),
+            lifecycleOwner.lifecycleScope
+        ) { track -> handleTrackClick(track) }
         recyclerView.adapter = trackAdapter
 
         historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        historyAdapter = TrackAdapter(requireContext()) { track -> handleTrackClick(track) }
+        historyAdapter = TrackAdapter(
+            requireContext(),
+            lifecycleOwner.lifecycleScope
+        ) { track -> handleTrackClick(track) }
         historyRecyclerView.adapter = historyAdapter
     }
 
