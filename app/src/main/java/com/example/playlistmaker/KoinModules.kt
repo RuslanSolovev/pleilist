@@ -11,7 +11,6 @@ import com.example.playlistmaker.domain.repositories.LikeRepository
 import com.example.playlistmaker.domain.repository.*
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
-import com.example.playlistmaker.presentation.SearchViewModel
 import com.example.playlistmaker.presentation.viewmodel.*
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
@@ -82,7 +81,7 @@ val interactorModule = module {
 val viewModelModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
-    viewModel { MediaViewModel(get(), get()) }
+    viewModel { MediaViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
 }
 
