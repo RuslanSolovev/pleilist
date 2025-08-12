@@ -1,26 +1,32 @@
+// Файл: package com.example.playlistmaker.domain.usecases
 package com.example.playlistmaker.domain.usecases
 
-import com.example.playlistmaker.domain.repositories.LikeRepository
+import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.repositories.FavoriteRepository
 
-class ToggleLikeUseCase(private val repository: LikeRepository) {
+class ToggleLikeUseCase(private val favoriteRepository: FavoriteRepository) {
 
-    // Основной метод для переключения состояния
-    operator fun invoke(trackId: String) {
-        repository.toggleLike(trackId)
+    // Основной метод для переключения состояния, работает с объектом Track
+    suspend operator fun invoke(track: Track) {
+        if (favoriteRepository.isFavorite(track.trackId)) {
+            // println("DEBUG: Removing track ${track.trackName} from favorites")
+            favoriteRepository.removeFromFavorites(track)
+        } else {
+            // println("DEBUG: Adding track ${track.trackName} to favorites")
+            favoriteRepository.addToFavorites(track)
+        }
     }
 
-    // Явное переключение состояния
-    fun toggleLike(trackId: String, currentState: Boolean) {
-        repository.toggleLike(trackId)
+    // Получение текущего статуса по ID
+    suspend fun getLikeStatus(trackId: String): Boolean {
+        return try {
+            favoriteRepository.isFavorite(trackId.toInt())
+        } catch (e: NumberFormatException) {
+            false
+        }
     }
 
-    // Получение текущего статуса
-    fun getLikeStatus(trackId: String): Boolean {
-        return repository.getLikeStatus(trackId)
-    }
-
-    // Установка конкретного состояния
-    fun setLikeStatus(trackId: String, isLiked: Boolean) {
-        repository.setLikeStatus(trackId, isLiked)
-    }
+    // Геттер для репозитория, чтобы MediaViewModel мог проверить статус после операции
+    // (альтернатива - добавить suspend fun isFavorite(trackId: Int) в сам UseCase)
+    val repository: FavoriteRepository get() = favoriteRepository
 }

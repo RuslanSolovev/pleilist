@@ -3,6 +3,7 @@ package com.example.playlistmaker.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.MediaPlayerInteractor
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
 import kotlinx.coroutines.Job
@@ -28,7 +29,7 @@ class MediaViewModel(
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
     private var timeUpdateJob: Job? = null
-    private var currentTrackId = -1
+    private var currentTrack: Track? = null // Храним весь объект Track
 
     init {
         mediaPlayerInteractor.setOnCompletionListener {
@@ -45,7 +46,6 @@ class MediaViewModel(
 
     fun preparePlayer(url: String) {
         _uiState.update { it.copy(isLoading = true) }
-
         mediaPlayerInteractor.prepare(
             url = url,
             onPrepared = {
@@ -76,11 +76,9 @@ class MediaViewModel(
         if (mediaPlayerInteractor.getCurrentPosition() >= mediaPlayerInteractor.getDuration()) {
             mediaPlayerInteractor.seekTo(0)
         }
-
         mediaPlayerInteractor.togglePlayPause()
         val isPlaying = !_uiState.value.isPlaying
         _uiState.update { it.copy(isPlaying = isPlaying) }
-
         if (isPlaying) {
             startProgressUpdates()
         } else {
@@ -109,8 +107,38 @@ class MediaViewModel(
         timeUpdateJob = null
     }
 
-    fun setTrackId(trackId: Int) {
-        currentTrackId = trackId
+    // Метод для установки данных трека
+    fun setTrackData(
+        trackId: Int,
+        trackName: String?,
+        artistName: String?,
+        artworkUrl: String?,
+        collectionName: String?,
+        releaseDate: String?,
+        primaryGenre: String?,
+        country: String?,
+        trackTimeMillis: Long?,
+        previewUrl: String?
+    ) {
+        // Создаем объект Track из переданных данных
+        // Все поля, кроме обязательных, заполняются данными или остаются null
+        val track = Track(
+            trackId = trackId,
+            trackName = trackName,
+            artistName = artistName,
+            trackTimeMillis = trackTimeMillis,
+            artworkUrl100 = artworkUrl,
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenreName = primaryGenre,
+            country = country,
+            previewUrl = previewUrl
+            // Поле isFavorite будет установлено позже при проверке статуса
+        )
+
+        this.currentTrack = track
+
+        // Получаем статус "лайка" из LikeRepository через ToggleLikeUseCase
         viewModelScope.launch {
             val isLiked = toggleLikeUseCase.getLikeStatus(trackId.toString())
             _uiState.update { it.copy(isLiked = isLiked) }
@@ -118,10 +146,21 @@ class MediaViewModel(
     }
 
     fun toggleLike() {
-        if (currentTrackId != -1) {
-            val currentState = _uiState.value.isLiked
-            toggleLikeUseCase.toggleLike(currentTrackId.toString(), currentState)
-            _uiState.update { it.copy(isLiked = !currentState) }
+        val track = currentTrack ?: return // Нет данных о треке
+        viewModelScope.launch {
+            try {
+
+                toggleLikeUseCase(track)
+
+
+                val newStatus = toggleLikeUseCase.getLikeStatus(track.trackId.toString())
+
+                _uiState.update { it.copy(isLiked = newStatus) }
+
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = "Ошибка при изменении лайка: ${e.message}") }
+
+            }
         }
     }
 

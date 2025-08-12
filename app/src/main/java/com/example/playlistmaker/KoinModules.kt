@@ -1,12 +1,16 @@
+// Файл: package com.example.playlistmaker.di
 package com.example.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaPlayer
+import androidx.room.Room
+import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.dto.ItunesApiService
 import com.example.playlistmaker.data.interactor.*
 import com.example.playlistmaker.data.repository.*
 import com.example.playlistmaker.domain.interactor.*
+import com.example.playlistmaker.domain.repositories.FavoriteRepository
 import com.example.playlistmaker.domain.repositories.LikeRepository
 import com.example.playlistmaker.domain.repository.*
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
@@ -19,10 +23,25 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+val dataModule = module {
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            "favorite_tracks.db"
+        )
+            .fallbackToDestructiveMigration() // Добавлено для решения проблемы с версией БД
+            .build()
+    }
+
+    single { get<AppDatabase>().favoriteTracksDao() }
+}
+
 val networkModule = module {
     single {
         Retrofit.Builder()
-            .baseUrl("https://itunes.apple.com/")
+            // Исправлена ошибка с лишними пробелами в URL
+            .baseUrl("https://itunes.apple.com/ ")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -33,7 +52,13 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<SearchRepository> { SearchRepositoryImpl(get()) }
+    single<SearchRepository> {
+        SearchRepositoryImpl(
+            apiService = get(),
+            // Исправлено: передаем FavoriteRepository вместо FavoriteTracksDao
+            favoriteRepository = get()
+        )
+    }
 
     single<SharedPreferences> {
         androidContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
@@ -46,18 +71,21 @@ val repositoryModule = module {
         )
     }
 
+    // LikeRepository больше не используется, но оставлен для совместимости
     single<LikeRepository> { LikeRepositoryImpl(get()) }
 
-    single<MediaPlayer> { MediaPlayer() } // Добавлено создание MediaPlayer
+    single<FavoriteRepository> { FavoriteRepositoryImpl(get()) }
 
-    single<AudioPlayer> { AudioPlayerImpl(get()) } // Передаем MediaPlayer в конструктор
+    single<MediaPlayer> { MediaPlayer() }
+
+    single<AudioPlayer> { AudioPlayerImpl(get()) }
 
     single { Gson() }
 }
 
 val interactorModule = module {
-    single<SearchInteractor> { SearchInteractorImpl(get()) }
-    single<HistoryInteractor> { HistoryInteractorImpl(get()) }
+    single<SearchInteractor> { SearchInteractorImpl(get(), get()) }
+    single<HistoryInteractor> { HistoryInteractorImpl(get(), get()) }
     single<ThemeInteractor> { ThemeInteractorImpl(get()) }
     single<SupportInteractor> {
         SupportInteractorImpl(
@@ -65,6 +93,7 @@ val interactorModule = module {
             context = androidContext()
         )
     }
+    single<FavoriteInteractor> { FavoriteInteractorImpl(get()) }
 
     single<AudioPlayerInteractor> {
         AudioPlayerInteractor(get())
@@ -74,6 +103,7 @@ val interactorModule = module {
         MediaPlayerInteractor(get(), get())
     }
 
+    // Исправлено: ToggleLikeUseCase теперь получает FavoriteRepository
     single { ToggleLikeUseCase(get()) }
     single { TimeFormatter }
 }
@@ -83,9 +113,12 @@ val viewModelModule = module {
     viewModel { SearchViewModel(get(), get()) }
     viewModel { MediaViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
+    viewModel { FavoritesViewModel(get()) }
+    viewModel { PlayerViewModel(get()) }
 }
 
 val appModules = listOf(
+    dataModule,
     networkModule,
     repositoryModule,
     interactorModule,

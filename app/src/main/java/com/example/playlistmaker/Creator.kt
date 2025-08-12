@@ -27,14 +27,5 @@ object Creator {
         Gson()
     }
 
-    fun provideSearchInteractor(context: Context): SearchInteractor {
-        val repository = SearchRepositoryImpl(apiService)
-        return SearchInteractorImpl(repository)
-    }
 
-    fun provideHistoryInteractor(context: Context): HistoryInteractor {
-        val sharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        val repository = HistoryRepositoryImpl(sharedPreferences, gson)
-        return HistoryInteractorImpl(repository)
-    }
 }
