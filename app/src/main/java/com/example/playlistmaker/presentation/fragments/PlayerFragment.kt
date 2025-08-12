@@ -35,38 +35,6 @@ class PlayerFragment : Fragment() {
     private lateinit var durationTextView: TextView
     private lateinit var artworkImageView: ImageView
 
-    private var trackId: Int = 0
-
-    companion object {
-        fun newInstance(
-            trackId: Int,
-            trackName: String?,
-            artistName: String?,
-            artworkUrl: String?,
-            collectionName: String?,
-            releaseDate: String?,
-            primaryGenre: String?,
-            country: String?,
-            trackTimeMillis: Long?,
-            previewUrl: String?
-        ): PlayerFragment {
-            return PlayerFragment().apply {
-                arguments = Bundle().apply {
-                    putInt("TRACK_ID", trackId)
-                    putString("TRACK_NAME", trackName)
-                    putString("ARTIST_NAME", artistName)
-                    putString("ARTWORK_URL", artworkUrl)
-                    putString("COLLECTION_NAME", collectionName)
-                    putString("RELEASE_DATE", releaseDate)
-                    putString("PRIMARY_GENRE", primaryGenre)
-                    putString("COUNTRY", country)
-                    trackTimeMillis?.let { putLong("TRACK_TIME_MILLIS", it) }
-                    putString("PREVIEW_URL", previewUrl)
-                }
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,7 +45,6 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initViews(view)
         setupObservers()
         setupClickListeners(view)
@@ -99,7 +66,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun loadTrackData() {
-        trackId = arguments?.getInt("TRACK_ID", 0) ?: 0
+        val trackId = arguments?.getInt("TRACK_ID", 0) ?: 0
         val trackName = arguments?.getString("TRACK_NAME")
         val artistName = arguments?.getString("ARTIST_NAME")
         val artworkUrl = arguments?.getString("ARTWORK_URL")?.replaceAfterLast('/', "512x512bb.jpg")
@@ -110,9 +77,23 @@ class PlayerFragment : Fragment() {
         val trackTimeMillis = arguments?.getLong("TRACK_TIME_MILLIS", 0L)
         val previewUrl = arguments?.getString("PREVIEW_URL")
 
-        viewModel.setTrackId(trackId)
+        // Передаем все данные в ViewModel
+        viewModel.setTrackData(
+            trackId = trackId,
+            trackName = trackName,
+            artistName = artistName,
+            artworkUrl = artworkUrl,
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenre = primaryGenre,
+            country = country,
+            trackTimeMillis = trackTimeMillis,
+            previewUrl = previewUrl
+        )
+
         previewUrl?.let { viewModel.preparePlayer(it) }
 
+        // Обновляем UI данными трека
         trackNameTextView.text = trackName ?: getString(R.string.unknown_track)
         artistNameTextView.text = artistName ?: getString(R.string.unknown_artist)
         albumTextView.text = collectionName ?: getString(R.string.unknown_album)
@@ -120,7 +101,6 @@ class PlayerFragment : Fragment() {
         genreTextView.text = primaryGenre ?: getString(R.string.unknown_genre)
         countryTextView.text = country ?: getString(R.string.unknown_country)
         durationTextView.text = TimeFormatter.formatTrackTime(trackTimeMillis ?: 0L)
-
         if (!artworkUrl.isNullOrEmpty()) {
             val radiusInPx = resources.getDimensionPixelSize(R.dimen.corner_radius_big)
             Glide.with(this)
@@ -144,7 +124,6 @@ class PlayerFragment : Fragment() {
                 likeButton.setImageResource(
                     if (state.isLiked) R.drawable.button__4_ else R.drawable.button__3_
                 )
-
                 state.error?.let { error ->
                     showError(error)
                 }
@@ -156,11 +135,9 @@ class PlayerFragment : Fragment() {
         playPauseButton.setOnClickListener {
             viewModel.togglePlayPause()
         }
-
         likeButton.setOnClickListener {
             viewModel.toggleLike()
         }
-
         view.findViewById<ImageButton>(R.id.back_button3).setOnClickListener {
             viewModel.releasePlayer()
             parentFragmentManager.popBackStack()
