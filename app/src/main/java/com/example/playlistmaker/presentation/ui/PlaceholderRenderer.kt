@@ -7,9 +7,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.example.playlistmaker.R
 
-/**
- * Управляет отображением экрана-заглушки (плейсхолдера) для разных состояний.
- */
 class PlaceholderRenderer(
     private val context: Context,
     private val placeholderRoot: View,
