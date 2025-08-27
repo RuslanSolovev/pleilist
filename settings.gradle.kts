@@ -6,7 +6,7 @@ pluginManagement {
     }
     plugins {
         id("com.google.dagger.hilt.android") version "2.55" apply false
-        id("com.android.application") version "8.4.0" apply false
+        id("com.android.application") version "8.6.0-beta02" apply false
         id("org.jetbrains.kotlin.android") version "1.9.0" apply false
         id("org.jetbrains.kotlin.kapt") version "1.9.0" apply false
     }

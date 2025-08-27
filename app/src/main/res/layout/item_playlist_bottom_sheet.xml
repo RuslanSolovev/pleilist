@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="16dp">
+
+    <!-- Обложка плейлиста -->
+    <ImageView
+        android:id="@+id/playlistCoverImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/light_mode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Название плейлиста -->
+    <TextView
+        android:id="@+id/playlistNameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/tracksCountTextView"
+        app:layout_constraintStart_toEndOf="@id/playlistCoverImageView"
+        app:layout_constraintTop_toTopOf="@id/playlistCoverImageView" />
+
+    <!-- Количество треков -->
+    <TextView
+        android:id="@+id/tracksCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/teal_200"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/playlistNameTextView" />
+
+    <!-- Статус (уже добавлен/не добавлен) -->
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/teal_200"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@id/playlistNameTextView"
+        app:layout_constraintStart_toStartOf="@id/playlistNameTextView"
+        app:layout_constraintTop_toBottomOf="@id/playlistNameTextView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

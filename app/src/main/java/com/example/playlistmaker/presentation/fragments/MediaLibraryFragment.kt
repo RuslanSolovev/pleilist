@@ -1,6 +1,6 @@
 package com.example.playlistmaker.presentation.fragments
 
-
+import MediaLibraryPagerAdapter
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
@@ -11,7 +11,7 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.playlistmaker.R
-import com.example.playlistmaker.presentation.adapter.MediaLibraryPagerAdapter
+
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 

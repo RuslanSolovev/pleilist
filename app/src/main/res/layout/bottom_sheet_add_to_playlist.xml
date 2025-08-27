@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="16dp">
+
+    <!-- Разделитель -->
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="#E6E8EB"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Заголовок -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Добавить в плейлист"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/chernii" />
+
+    <!-- Кнопка создания нового плейлиста -->
+    <Button
+        android:id="@+id/createNewPlaylistButton"
+        android:layout_width="wrap_content"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Новый плейлист"
+        android:layout_gravity="center"
+        style="@style/obnovit_rnopka" />
+
+
+
+    <!-- Список плейлистов -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlistsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+</LinearLayout>
