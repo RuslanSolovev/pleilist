@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Синий цвет, если есть текст (даже без фокуса) -->
+    <item android:color="@color/blue_primary" android:state_activated="true" />
+    <!-- Синий цвет при фокусе -->
+    <item android:color="@color/blue_primary" android:state_focused="true" />
+    <!-- Синий цвет при наведении -->
+    <item android:color="@color/blue_primary" android:state_hovered="true" />
+    <!-- Синий цвет по умолчанию, если поле заполнено -->
+    <item android:color="@color/blue_primary" android:state_enabled="true" />
+    <!-- Серый цвет в остальных случаях -->
+    <item android:color="@color/text_primary" />
+</selector>

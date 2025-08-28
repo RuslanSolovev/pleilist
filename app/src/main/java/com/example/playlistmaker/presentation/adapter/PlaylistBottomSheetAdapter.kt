@@ -37,11 +37,11 @@ class PlaylistBottomSheetAdapter(
             Glide.with(holder.coverImageView.context)
                 .load(playlist.coverImagePath)
                 .apply(RequestOptions().centerCrop().transform(RoundedCorners(8)))
-                .placeholder(R.drawable.light_mode)
-                .error(R.drawable.light_mode)
+                .placeholder(R.drawable.vector)
+                .error(R.drawable.vector)
                 .into(holder.coverImageView)
         } else {
-            holder.coverImageView.setImageResource(R.drawable.light_mode)
+            holder.coverImageView.setImageResource(R.drawable.vector)
         }
 
         holder.nameTextView.text = playlist.name

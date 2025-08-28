@@ -28,11 +28,21 @@ class MainActivity : AppCompatActivity() {
         // Настройка навигации
         bottomNav.setupWithNavController(navController)
 
-        // Скрываем BottomNavigationView на экране плеера
+        // Скрываем BottomNavigationView на экране плеера и ActionBar для определенных фрагментов
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when(destination.id) {
-                R.id.playerFragment -> bottomNav.visibility = View.GONE
-                else -> bottomNav.visibility = View.VISIBLE
+                R.id.playerFragment -> {
+                    bottomNav.visibility = View.GONE
+                    supportActionBar?.hide()
+                }
+                R.id.createPlaylistFragment -> {
+                    bottomNav.visibility = View.GONE
+                    supportActionBar?.hide()
+                }
+                else -> {
+                    bottomNav.visibility = View.VISIBLE
+                    supportActionBar?.show()
+                }
             }
         }
     }

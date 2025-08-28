@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:padding="16dp">
@@ -11,7 +12,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/light_mode"
+        android:src="@drawable/vector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -25,33 +26,39 @@
         android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/black"
+        style="@style/dob_v_pllist"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/tracksCountTextView"
         app:layout_constraintStart_toEndOf="@id/playlistCoverImageView"
-        app:layout_constraintTop_toTopOf="@id/playlistCoverImageView" />
-
-    <!-- Количество треков -->
-    <TextView
-        android:id="@+id/tracksCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/teal_200"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/playlistNameTextView" />
+        app:layout_constraintEnd_toStartOf="@+id/statusTextView"
+    app:layout_constraintTop_toTopOf="@id/playlistCoverImageView"
+    app:layout_constraintHorizontal_bias="0"
+    tools:text="Название плейлиста" />
 
     <!-- Статус (уже добавлен/не добавлен) -->
     <TextView
         android:id="@+id/statusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/teal_200"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/playlistNameTextView"
+        app:layout_constraintBottom_toBottomOf="@id/playlistNameTextView"
+        tools:text="Уже добавлен" />
+
+    <!-- Количество треков -->
+    <TextView
+        android:id="@+id/tracksCountTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textColor="@color/teal_200"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@id/playlistNameTextView"
+        android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@id/playlistNameTextView"
-        app:layout_constraintTop_toBottomOf="@id/playlistNameTextView" />
+    app:layout_constraintEnd_toStartOf="@+id/statusTextView"
+    app:layout_constraintTop_toBottomOf="@id/playlistNameTextView"
+    app:layout_constraintHorizontal_bias="0"
+    tools:text="12 треков" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

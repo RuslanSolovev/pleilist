@@ -26,7 +26,6 @@ class CreatePlaylistViewModel(
     val uiState: StateFlow<CreatePlaylistState> = _uiState.asStateFlow()
 
     fun updateName(name: String) {
-        // Только проверка названия для активации кнопки
         _uiState.value = _uiState.value.copy(
             name = name,
             isCreateButtonEnabled = name.isNotBlank()
@@ -43,16 +42,13 @@ class CreatePlaylistViewModel(
 
     fun createPlaylist(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val state = _uiState.value
-        // ТОЛЬКО проверка названия
         if (state.name.isNotBlank()) {
-            // Блокируем кнопку
             _uiState.value = _uiState.value.copy(isCreateButtonEnabled = false)
 
             viewModelScope.launch {
                 try {
                     Log.d("CreatePlaylistVM", "Starting playlist creation")
 
-                    // Копируем изображение
                     val coverImagePath = if (state.coverImageUri != null) {
                         copyCoverImageToInternalStorage(state.coverImageUri)
                     } else {
@@ -60,14 +56,13 @@ class CreatePlaylistViewModel(
                     }
                     Log.d("CreatePlaylistVM", "Cover image path: $coverImagePath")
 
-                    // Создаем объект Playlist
-                    // Описание может быть null или пустой строкой - оба варианта допустимы
                     val descriptionToUse = state.description.takeIf { it.isNotBlank() }
 
                     val newPlaylist = Playlist(
-                        name = state.name.trim(), // Убираем пробелы по краям
-                        description = descriptionToUse, // Может быть null
-                        coverImagePath = coverImagePath, // Может быть null
+                        id = 0,
+                        name = state.name.trim(),
+                        description = descriptionToUse,
+                        coverImagePath = coverImagePath,
                         trackIds = emptyList(),
                         tracksCount = 0,
                         createdAt = System.currentTimeMillis()
@@ -75,13 +70,11 @@ class CreatePlaylistViewModel(
 
                     Log.d("CreatePlaylistVM", "Playlist object created: $newPlaylist")
 
-                    // Вызываем UseCase
                     createPlaylistUseCase(newPlaylist)
 
                     onSuccess(state.name.trim())
                 } catch (e: Exception) {
                     Log.e("CreatePlaylistVM", "Error creating playlist", e)
-                    // Разблокируем кнопку при ошибке
                     _uiState.value = _uiState.value.copy(isCreateButtonEnabled = true)
                     onError(e.message ?: "Неизвестная ошибка при создании плейлиста")
                 }
