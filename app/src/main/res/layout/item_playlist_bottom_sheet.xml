@@ -3,62 +3,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:padding="16dp">
+    android:layout_height="80dp">
 
-    <!-- Обложка плейлиста -->
-    <ImageView
-        android:id="@+id/playlistCoverImageView"
+    <!-- Обложка плейлиста с закругленными углами -->
+    <FrameLayout
+        android:id="@+id/coverContainer"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/vector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginTop="@dimen/otstup_8"
+        android:layout_marginBottom="@dimen/otstup_8"
+        android:layout_marginStart="13dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/playlistCoverImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/vector" />
+
+    </FrameLayout>
 
     <!-- Название плейлиста -->
     <TextView
         android:id="@+id/playlistNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="44dp"
         android:ellipsize="end"
+        android:layout_marginTop="3dp"
         android:maxLines="1"
         style="@style/dob_v_pllist"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/playlistCoverImageView"
-        app:layout_constraintEnd_toStartOf="@+id/statusTextView"
-    app:layout_constraintTop_toTopOf="@id/playlistCoverImageView"
-    app:layout_constraintHorizontal_bias="0"
-    tools:text="Название плейлиста" />
-
-    <!-- Статус (уже добавлен/не добавлен) -->
-    <TextView
-        android:id="@+id/statusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/teal_200"
-        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/coverContainer"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/playlistNameTextView"
-        app:layout_constraintBottom_toBottomOf="@id/playlistNameTextView"
-        tools:text="Уже добавлен" />
+        app:layout_constraintTop_toTopOf="@id/coverContainer"
+        tools:text="Название плейлиста" />
 
     <!-- Количество треков -->
     <TextView
         android:id="@+id/tracksCountTextView"
         android:layout_width="0dp"
+        android:layout_marginEnd="44dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/teal_200"
-        android:textSize="14sp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="@dimen/otstup_26"
+        style="@style/dob_v_pllist2"
+        android:textSize="11sp"
         app:layout_constraintStart_toStartOf="@id/playlistNameTextView"
-    app:layout_constraintEnd_toStartOf="@+id/statusTextView"
-    app:layout_constraintTop_toBottomOf="@id/playlistNameTextView"
-    app:layout_constraintHorizontal_bias="0"
-    tools:text="12 треков" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playlistNameTextView"
+        tools:text="12 треков" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

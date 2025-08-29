@@ -1,12 +1,12 @@
+import android.graphics.Outline
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Playlist
 
@@ -17,10 +17,10 @@ class PlaylistBottomSheetAdapter(
 ) : RecyclerView.Adapter<PlaylistBottomSheetAdapter.PlaylistViewHolder>() {
 
     class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val coverContainer: FrameLayout = view.findViewById(R.id.coverContainer)
         val coverImageView: ImageView = view.findViewById(R.id.playlistCoverImageView)
         val nameTextView: TextView = view.findViewById(R.id.playlistNameTextView)
         val tracksCountTextView: TextView = view.findViewById(R.id.tracksCountTextView)
-        val statusTextView: TextView = view.findViewById(R.id.statusTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
@@ -32,11 +32,19 @@ class PlaylistBottomSheetAdapter(
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
         val playlist = playlists[position]
 
+        // Применяем закругление к контейнеру
+        holder.coverContainer.clipToOutline = true
+        holder.coverContainer.outlineProvider = object : android.view.ViewOutlineProvider() {
+            override fun getOutline(view: android.view.View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, 2f * view.resources.displayMetrics.density)
+            }
+        }
+
         // Загрузка обложки
         if (!playlist.coverImagePath.isNullOrBlank()) {
             Glide.with(holder.coverImageView.context)
                 .load(playlist.coverImagePath)
-                .apply(RequestOptions().centerCrop().transform(RoundedCorners(8)))
+                .centerCrop()
                 .placeholder(R.drawable.vector)
                 .error(R.drawable.vector)
                 .into(holder.coverImageView)
@@ -54,15 +62,6 @@ class PlaylistBottomSheetAdapter(
             else -> "${playlist.tracksCount} ${holder.itemView.context.getString(R.string.many_tracks)}"
         }
         holder.tracksCountTextView.text = trackCountText
-
-        // Проверяем, добавлен ли уже трек в этот плейлист
-        val isTrackInPlaylist = playlist.trackIds.contains(currentTrackId)
-        if (isTrackInPlaylist) {
-            holder.statusTextView.text = "Уже добавлен"
-            holder.statusTextView.visibility = View.VISIBLE
-        } else {
-            holder.statusTextView.visibility = View.GONE
-        }
 
         holder.itemView.setOnClickListener {
             onPlaylistClicked(playlist)

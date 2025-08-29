@@ -1,4 +1,4 @@
-// package com.example.playlistmaker.presentation.adapter
+package com.example.playlistmaker.presentation.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,11 +41,11 @@ class PlaylistsAdapter(
                 Glide.with(coverImageView.context)
                     .load(playlist.coverImagePath)
                     .apply(RequestOptions().centerCrop().transform(RoundedCorners(8)))
-                    .placeholder(R.drawable.vector)
-                    .error(R.drawable.vector)
+                    .placeholder(R.drawable.placeholder_vector) // Используем отдельный placeholder
+                    .error(R.drawable.placeholder_vector) // Используем отдельный error image
                     .into(coverImageView)
             } else {
-                coverImageView.setImageResource(R.drawable.vector)
+                coverImageView.setImageResource(R.drawable.placeholder_vector) // Используем отдельный placeholder
             }
 
             nameTextView.text = playlist.name

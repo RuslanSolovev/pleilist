@@ -16,16 +16,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/strelka"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Заголовок "Новый плейлист" -->
-
-
-        <!-- Обложка плейлиста -->
         <TextView
             android:id="@+id/titleText"
             android:layout_width="0dp"
@@ -38,18 +34,17 @@
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/backButton"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Обложка плейлиста -->
         <FrameLayout
             android:id="@+id/coverContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="312dp"
+            android:layout_height="312dp"
             android:layout_marginTop="42dp"
-            android:layout_marginBottom="33dp"
-            android:layout_marginStart="@dimen/ikonka_24"
-            android:layout_marginEnd="@dimen/ikonka_24"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/backButton">
@@ -61,8 +56,6 @@
                 android:background="@drawable/rounded_corners_big"
                 android:scaleType="centerCrop"
                 android:src="@drawable/group_180" />
-
-
 
         </FrameLayout>
 
@@ -104,7 +97,7 @@
                 android:id="@+id/descriptionEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Описание (необязательно)"
+                android:hint="Описание"
                 android:imeOptions="actionDone"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLines="3"
@@ -125,7 +118,9 @@
             android:text="Создать"
             android:textColor="@color/white"
             android:backgroundTint="@color/button_background_color_state"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionInputLayout"
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
