@@ -14,7 +14,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.6.1")
+        classpath("com.android.tools.build:gradle:8.6.0-beta02")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
         // Hilt плагин удалён
     }

@@ -31,7 +31,34 @@
         android:id="@+id/playerFragment"
         android:name="com.example.playlistmaker.presentation.fragments.PlayerFragment"
         android:label="Player">
-        <argument android:name="TRACK_ID" app:argType="integer" />
-        <!-- остальные аргументы -->
+        <argument
+            android:name="TRACK_ID"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_playerFragment_to_createPlaylistFragment"
+            app:destination="@id/createPlaylistFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.presentation.fragments.PlaylistsFragment"
+        android:label="PlaylistsFragment"
+        tools:layout="@layout/fragment_playlists">
+        <action
+            android:id="@+id/action_playlistsFragment_to_createPlaylistFragment"
+            app:destination="@id/createPlaylistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPlaylistFragment"
+        android:name="com.example.playlistmaker.presentation.fragments.CreatePlaylistFragment"
+        android:label="CreatePlaylistFragment"
+        tools:layout="@layout/fragment_create_playlist" />
+
+
+    <!-- ГЛОБАЛЬНОЕ ДЕЙСТВИЕ - ключ к решению -->
+    <action
+        android:id="@+id/action_global_createPlaylistFragment"
+        app:destination="@id/createPlaylistFragment" />
+
 </navigation>

@@ -15,10 +15,13 @@
     <dimen name="otstup_44">44dp</dimen>
     <dimen name="otstup_19">19dp</dimen>
 
+    <dimen name="input_stroke_width_normal">1dp</dimen>
+    <dimen name="input_stroke_width_active">2dp</dimen>
     <dimen name="otstup_312">312dp</dimen>
     <dimen name="otstup_26">26dp</dimen>
     <dimen name="otstup_32">32dp</dimen>
-
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
     <dimen name="corner_radius_small">2dp</dimen>  <!-- Для маленьких обложек -->
     <dimen name="corner_radius_medium">4dp</dimen> <!-- Для средних -->
     <dimen name="corner_radius_big">8dp</dimen>    <!-- Для больших -->

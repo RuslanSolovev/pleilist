@@ -2,5 +2,5 @@
 <resources>
 
     <color name="qwer">#FFFFFFFF</color>
-
+    <color name="card_background_dark">#1A1B22</color>
 </resources>

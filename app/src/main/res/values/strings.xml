@@ -59,5 +59,10 @@
     <string name="unknown_genre">"Неизвестен"</string>
     <string name="unknown_country">"Неизвестен"</string>
 
+    <string name="no_tracks">0 треков</string>
+    <string name="one_track">трек</string>
+    <string name="few_tracks">трека</string>
+    <string name="many_tracks">треков</string>
+
 </resources>
 

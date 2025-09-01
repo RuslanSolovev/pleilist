@@ -3,7 +3,10 @@ package com.example.playlistmaker.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactor.MediaPlayerInteractor
+import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.usecase.AddTrackToPlaylistUseCase
+import com.example.playlistmaker.domain.usecase.GetAllPlaylistsUseCase
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
 import kotlinx.coroutines.Job
@@ -17,6 +20,8 @@ import kotlinx.coroutines.launch
 class MediaViewModel(
     private val mediaPlayerInteractor: MediaPlayerInteractor,
     private val toggleLikeUseCase: ToggleLikeUseCase,
+    private val getAllPlaylistsUseCase: GetAllPlaylistsUseCase,
+    private val addTrackToPlaylistUseCase: AddTrackToPlaylistUseCase,
     private val timeFormatter: TimeFormatter
 ) : ViewModel() {
 
@@ -28,8 +33,14 @@ class MediaViewModel(
     )
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
+    private val _playlistsState = MutableStateFlow<List<Playlist>>(emptyList())
+    val playlistsState: StateFlow<List<Playlist>> = _playlistsState.asStateFlow()
+
+    private val _addToPlaylistResult = MutableStateFlow<AddToPlaylistResult?>(null)
+    val addToPlaylistResult: StateFlow<AddToPlaylistResult?> = _addToPlaylistResult.asStateFlow()
+
     private var timeUpdateJob: Job? = null
-    private var currentTrack: Track? = null // Храним весь объект Track
+    private var currentTrack: Track? = null
 
     init {
         mediaPlayerInteractor.setOnCompletionListener {
@@ -41,6 +52,15 @@ class MediaViewModel(
                 )
             }
             mediaPlayerInteractor.seekTo(0)
+        }
+        loadPlaylists()
+    }
+
+    private fun loadPlaylists() {
+        viewModelScope.launch {
+            getAllPlaylistsUseCase().collect { playlists ->
+                _playlistsState.value = playlists
+            }
         }
     }
 
@@ -107,7 +127,6 @@ class MediaViewModel(
         timeUpdateJob = null
     }
 
-    // Метод для установки данных трека
     fun setTrackData(
         trackId: Int,
         trackName: String?,
@@ -120,8 +139,6 @@ class MediaViewModel(
         trackTimeMillis: Long?,
         previewUrl: String?
     ) {
-        // Создаем объект Track из переданных данных
-        // Все поля, кроме обязательных, заполняются данными или остаются null
         val track = Track(
             trackId = trackId,
             trackName = trackName,
@@ -133,12 +150,10 @@ class MediaViewModel(
             primaryGenreName = primaryGenre,
             country = country,
             previewUrl = previewUrl
-            // Поле isFavorite будет установлено позже при проверке статуса
         )
 
         this.currentTrack = track
 
-        // Получаем статус "лайка" из LikeRepository через ToggleLikeUseCase
         viewModelScope.launch {
             val isLiked = toggleLikeUseCase.getLikeStatus(trackId.toString())
             _uiState.update { it.copy(isLiked = isLiked) }
@@ -146,22 +161,50 @@ class MediaViewModel(
     }
 
     fun toggleLike() {
-        val track = currentTrack ?: return // Нет данных о треке
+        val track = currentTrack ?: return
         viewModelScope.launch {
             try {
-
                 toggleLikeUseCase(track)
-
-
                 val newStatus = toggleLikeUseCase.getLikeStatus(track.trackId.toString())
-
                 _uiState.update { it.copy(isLiked = newStatus) }
-
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Ошибка при изменении лайка: ${e.message}") }
-
             }
         }
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val track = currentTrack ?: return
+
+        viewModelScope.launch {
+            try {
+                val result = addTrackToPlaylistUseCase(track, playlist.id)
+
+                if (result) {
+                    _addToPlaylistResult.value = AddToPlaylistResult.Success(playlist.name)
+                } else {
+                    _addToPlaylistResult.value = AddToPlaylistResult.AlreadyExists(playlist.name)
+                }
+
+                // Обновляем список плейлистов
+                loadPlaylists()
+
+            } catch (e: Exception) {
+                _addToPlaylistResult.value = AddToPlaylistResult.Error(e.message ?: "Ошибка добавления")
+            }
+        }
+    }
+
+    fun clearAddToPlaylistResult() {
+        _addToPlaylistResult.value = null
+    }
+
+    fun getCurrentTrack(): Track? {
+        return currentTrack
+    }
+
+    fun refreshPlaylists() {
+        loadPlaylists()
     }
 
     fun releasePlayer() {
@@ -178,3 +221,9 @@ data class PlayerUiState(
     val isLiked: Boolean = false,
     val error: String? = null
 )
+
+sealed class AddToPlaylistResult {
+    data class Success(val playlistName: String) : AddToPlaylistResult()
+    data class AlreadyExists(val playlistName: String) : AddToPlaylistResult()
+    data class Error(val message: String) : AddToPlaylistResult()
+}

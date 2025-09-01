@@ -1,18 +1,29 @@
-// Файл: package com.example.playlistmaker.di
 package com.example.playlistmaker.di
+
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import androidx.room.Room
 import com.example.playlistmaker.data.db.AppDatabase
+import com.example.playlistmaker.data.db.PlaylistDao
+import com.example.playlistmaker.data.db.TrackForPlaylistDao
 import com.example.playlistmaker.data.dto.ItunesApiService
 import com.example.playlistmaker.data.interactor.*
+import com.example.playlistmaker.data.repository.PlaylistRepositoryImpl
 import com.example.playlistmaker.data.repository.*
 import com.example.playlistmaker.domain.interactor.*
 import com.example.playlistmaker.domain.repositories.FavoriteRepository
 import com.example.playlistmaker.domain.repositories.LikeRepository
-import com.example.playlistmaker.domain.repository.*
+import com.example.playlistmaker.domain.repository.AudioPlayer
+import com.example.playlistmaker.domain.repository.HistoryRepository
+import com.example.playlistmaker.domain.repository.PlaylistRepository
+import com.example.playlistmaker.domain.repository.SearchRepository
+import com.example.playlistmaker.domain.usecase.AddTrackToPlaylistUseCase
+import com.example.playlistmaker.domain.usecase.CreatePlaylistUseCase
+import com.example.playlistmaker.domain.usecase.DeletePlaylistUseCase
+import com.example.playlistmaker.domain.usecase.GetAllPlaylistsUseCase
+
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
 import com.example.playlistmaker.presentation.viewmodel.*
@@ -28,20 +39,21 @@ val dataModule = module {
         Room.databaseBuilder(
             androidContext(),
             AppDatabase::class.java,
-            "favorite_tracks.db"
+            "playlist_maker.db"
         )
-            .fallbackToDestructiveMigration() // Добавлено для решения проблемы с версией БД
+            .fallbackToDestructiveMigration()
             .build()
     }
 
     single { get<AppDatabase>().favoriteTracksDao() }
+    single { get<AppDatabase>().playlistDao() }
+    single { get<AppDatabase>().trackForPlaylistDao() }
 }
 
 val networkModule = module {
     single {
         Retrofit.Builder()
-            // Исправлена ошибка с лишними пробелами в URL
-            .baseUrl("https://itunes.apple.com/ ")
+            .baseUrl("https://itunes.apple.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -55,7 +67,6 @@ val repositoryModule = module {
     single<SearchRepository> {
         SearchRepositoryImpl(
             apiService = get(),
-            // Исправлено: передаем FavoriteRepository вместо FavoriteTracksDao
             favoriteRepository = get()
         )
     }
@@ -71,10 +82,17 @@ val repositoryModule = module {
         )
     }
 
-    // LikeRepository больше не используется, но оставлен для совместимости
     single<LikeRepository> { LikeRepositoryImpl(get()) }
 
     single<FavoriteRepository> { FavoriteRepositoryImpl(get()) }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(
+            playlistDao = get(),
+            trackForPlaylistDao = get(),
+            gson = get()
+        )
+    }
 
     single<MediaPlayer> { MediaPlayer() }
 
@@ -102,19 +120,23 @@ val interactorModule = module {
     single<MediaPlayerInteractor> {
         MediaPlayerInteractor(get(), get())
     }
-
-    // Исправлено: ToggleLikeUseCase теперь получает FavoriteRepository
+    single { DeletePlaylistUseCase(get()) }
+    single { CreatePlaylistUseCase(get()) }
+    single { GetAllPlaylistsUseCase(get()) }
     single { ToggleLikeUseCase(get()) }
     single { TimeFormatter }
+    single { AddTrackToPlaylistUseCase (get())}
 }
 
 val viewModelModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
-    viewModel { MediaViewModel(get(), get(), get()) }
+    viewModel { MediaViewModel(get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
     viewModel { FavoritesViewModel(get()) }
     viewModel { PlayerViewModel(get()) }
+    viewModel { CreatePlaylistViewModel(get(), androidContext()) }
+    viewModel { PlaylistsViewModel(get(), get()) }
 }
 
 val appModules = listOf(
