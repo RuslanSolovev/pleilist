@@ -1,9 +1,10 @@
-package com.example.playlistmaker.presentation.fragments
+// package com.example.playlistmaker.presentation.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -11,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentFavoritesBinding
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.presentation.adapter.OnTrackClickListener
 import com.example.playlistmaker.presentation.adapter.TrackAdapter
+
 import com.example.playlistmaker.presentation.viewmodel.FavoritesViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,10 +42,27 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        // --- Создаем объект, реализующий OnTrackClickListener ---
+        val trackClickListener = object : OnTrackClickListener {
+            override fun onItemClick(track: Track) {
+                handleTrackClick(track)
+            }
+
+            override fun onItemLongClick(track: Track) {
+
+                Toast.makeText(requireContext(), "Долгий клик: ${track.trackName}", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+        // -------------------------------------------------------------
+
+        // --- Передаем объект-слушатель в конструктор адаптера ---
         adapter = TrackAdapter(
-            requireContext(),
-            viewLifecycleOwner.lifecycleScope
-        ) { track -> handleTrackClick(track) }
+            context = requireContext(),
+            lifecycleScope = viewLifecycleOwner.lifecycleScope,
+            onTrackClickListener = trackClickListener // <<< Передаем OnTrackClickListener
+        )
+        // ---------------------------------------------------------
 
         binding.recyclerViewFavorites.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewFavorites.adapter = adapter
@@ -71,7 +91,6 @@ class FavoritesFragment : Fragment() {
 
     private fun handleTrackClick(track: Track) {
         // Создаем Bundle с аргументами для PlayerFragment
-        // Мы используем те же ключи, что и в PlayerFragment.newInstance
         val bundle = Bundle().apply {
             putInt("TRACK_ID", track.trackId)
             putString("TRACK_NAME", track.trackName)
@@ -86,8 +105,12 @@ class FavoritesFragment : Fragment() {
         }
 
         // Переходим на PlayerFragment, передавая аргументы
-        // Убедись, что ID destination в nav_graph.xml именно такой: playerFragment
-        findNavController().navigate(R.id.playerFragment, bundle)
+        try {
+            findNavController().navigate(R.id.playerFragment, bundle)
+        } catch (e: Exception) {
+            // Обработка ошибки навигации
+            Toast.makeText(requireContext(), "Ошибка перехода к плееру", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

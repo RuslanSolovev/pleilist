@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background">
+
+    <!-- Разделитель (шапка шторки) -->
+<View
+android:layout_width="50dp"
+android:layout_height="4dp"
+android:layout_gravity="center"
+style="@style/palka"
+    android:layout_marginTop="@dimen/otstup_8"/>
+
+
+
+    <!-- RecyclerView для списка треков внутри шторки -->
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/tracksRecyclerView"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1"
+android:layout_marginTop="8dp"
+android:paddingHorizontal="16dp"
+android:paddingBottom="16dp"
+    android:clipToPadding="false"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+    tools:itemCount="5"
+    tools:listitem="@layout/item_track" />
+
+
+
+    </LinearLayout>

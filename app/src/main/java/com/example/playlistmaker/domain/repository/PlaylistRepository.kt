@@ -13,4 +13,15 @@ interface PlaylistRepository {
     suspend fun isTrackInPlaylist(trackId: Int, playlistId: Long): Boolean
     suspend fun deletePlaylist(playlistId: Long)
 
+
+
+
+
+    suspend fun removeTrackFromPlaylist(trackId: Int, playlistId: Long)
+
+    suspend fun getTracksForPlaylist(trackIds: List<Int>): List<Track>
+
+    suspend fun getAllPlaylistsSync(): List<Playlist>
+
+
 }

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background3">
+
+    <!-- Разделитель (шапка шторки) -->
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        style="@style/palka"
+        android:layout_marginTop="@dimen/otstup_8"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Информация о плейлисте в меню -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/menuPlaylistInfoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/menuPlaylistCoverImageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/placeholder_vector"
+            android:contentDescription="@string/playlist_cover"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/menuPlaylistNameTextView"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_bias="0" />
+
+        <TextView
+            android:id="@+id/menuPlaylistNameTextView"
+            style="@style/dtn_noz"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@android:color/transparent"
+            android:textStyle="bold"
+            android:layout_marginTop="6dp"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/menuPlaylistCoverImageView"
+            app:layout_constraintTop_toTopOf="@id/menuPlaylistCoverImageView"
+            tools:text="My Favorite Songs" />
+
+        <TextView
+            android:id="@+id/menuTracksCountTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            style="@style/dtn_noz2"
+            android:textSize="11sp"
+            android:background="@android:color/transparent"
+            app:layout_constraintStart_toEndOf="@id/menuPlaylistCoverImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuPlaylistNameTextView"
+            tools:text="30 tracks" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Список действий в меню -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/transparent">
+
+        <!-- Кнопка "Поделиться" в меню -->
+        <TextView
+            android:id="@+id/menuShareButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="21dp"
+            android:layout_marginTop="@dimen/otstup_8"
+            android:paddingStart="16dp"
+            android:text="Поделиться"
+            style="@style/dtn_noz"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Кнопка "Редактировать информацию" в меню -->
+        <TextView
+            android:id="@+id/menuEditInfoButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="21dp"
+            android:paddingStart="16dp"
+            android:text="@string/edit_information"
+            style="@style/dtn_noz"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Кнопка "Удалить плейлист" в меню -->
+        <TextView
+            android:id="@+id/menuDeletePlaylistButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="21dp"
+            android:paddingStart="16dp"
+            android:text="@string/delete_playlist"
+            style="@style/dtn_noz"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</LinearLayout>
