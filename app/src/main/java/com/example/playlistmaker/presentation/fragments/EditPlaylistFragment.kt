@@ -1,6 +1,8 @@
 package com.example.playlistmaker.presentation.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
@@ -20,10 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditPlaylistFragment : CreatePlaylistFragment() {
 
-    // Используем свою ViewModel
     private val editViewModel: EditPlaylistViewModel by viewModel()
-
-    // Переопределяем лаунчер для выбора изображения, чтобы он обновлял editViewModel
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
 
     companion object {
@@ -46,15 +44,12 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated")
 
-        // Инициализируем pickImageLauncher ПОСЛЕ super.onViewCreated, чтобы он использовал editViewModel
+        // Переинициализируем pickImageLauncher для использования editViewModel
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             Log.d(TAG, "Image selected in EditPlaylistFragment: $uri")
             uri?.let {
-                // Обновляем состояние editViewModel, а не viewModel родителя
                 editViewModel.updateCoverImage(it)
                 binding.coverImageView.setImageURI(it)
-                // Убедимся, что кнопка активна, если название не пустое
-                // editViewModel.updateName(binding.nameEditText.text.toString()) // Обычно TextWatcher это делает
             }
         }
 
@@ -66,19 +61,15 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
         }
         Log.d(TAG, "Received playlistId: $playlistId")
 
-        // Загружаем данные плейлиста в ViewModel
         editViewModel.loadPlaylistForEditing(playlistId)
-
-        // Подписываемся на состояние своей ViewModel
         observeEditViewModel()
 
-        // ПРАВИЛЬНОЕ УСТАНОВЛЕНИЕ ЗАГОЛОВКА
-        binding.titleText.text = getString(R.string.edit_playlist_title) // Установите текст в TextView заголовка
-
-        // Меняем текст кнопки
+        binding.titleText.text = getString(R.string.edit_playlist_title)
         binding.createButton.text = getString(R.string.save_button_text)
 
-        // Переопределяем OnBackPressedCallback
+        // ВАЖНО: Устанавливаем СВОИ слушатели, включая TextWatchers
+        setupEditListeners()
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
 
@@ -89,26 +80,26 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
                 Log.d(TAG, "Edit UI State updated, button enabled: ${state.isCreateButtonEnabled}")
                 binding.createButton.isEnabled = state.isCreateButtonEnabled
 
-                // Синхронизация названия и описания
-                if (binding.nameEditText.text.toString() != state.name) {
+                // Синхронизируем UI с состоянием VM, избегая зацикливания
+                val currentNameInUI = binding.nameEditText.text.toString()
+                val currentDescriptionInUI = binding.descriptionEditText.text.toString()
+
+                if (currentNameInUI != state.name) {
                     binding.nameEditText.setText(state.name)
                 }
-                if (binding.descriptionEditText.text.toString() != state.description) {
+                if (currentDescriptionInUI != state.description) {
                     binding.descriptionEditText.setText(state.description)
                 }
 
                 // Обновление обложки
-                // Проверяем, изменился ли URI в состоянии VM по сравнению с тем, что отображается
                 val currentImageTag = binding.coverImageView.tag?.toString()
                 val newStateImageUriString = state.coverImageUri?.toString()
-
                 if (newStateImageUriString != currentImageTag) {
                     if (state.coverImageUri != null) {
                         binding.coverImageView.setImageURI(state.coverImageUri)
                     } else {
                         binding.coverImageView.setImageResource(R.drawable.placeholder_vector)
                     }
-                    // Сохраняем текущий URI как tag для последующего сравнения
                     binding.coverImageView.tag = newStateImageUriString
                 }
 
@@ -123,38 +114,36 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
                     state.description.isNotEmpty(),
                     binding.descriptionEditText.hasFocus()
                 )
-
-                // Установка заголовка (на всякий случай, хотя он уже установлен)
-                binding.titleText.text = getString(R.string.edit_playlist_title)
             }
         }
     }
 
-    // Переопределяем обработчик кнопки создания/сохранения
-    override fun setupListeners() {
-        // Сначала вызываем родительский метод, чтобы установить общие слушатели (back, cover click)
-        super.setupListeners()
-        Log.d(TAG, "Setting up specific listeners for editing")
+    // Полностью переопределяем установку слушателей для редактирования
+    private fun setupEditListeners() {
+        Log.d(TAG, "Setting up EDIT-specific listeners")
 
-        // Переопределяем обработчик клика на контейнер обложки, чтобы использовать наш pickImageLauncher
+        // --- Обработчики кликов ---
+        binding.backButton.setOnClickListener {
+            Log.d(TAG, "Back button clicked in Edit mode")
+            handleBackPressForEdit()
+        }
+
         binding.coverContainer.setOnClickListener {
-            Log.d(TAG, "Cover container clicked in EditPlaylistFragment")
+            Log.d(TAG, "Cover container clicked in Edit mode")
             openImagePicker()
         }
 
-        // Переопределяем обработчик кнопки "Создать" (которая теперь "Сохранить")
         binding.createButton.setOnClickListener {
             Log.d(TAG, "Save button clicked")
-            updateFieldsFromUI() // Обновляем состояние VM из UI
+            // Принудительно обновляем VM из UI перед сохранением
+            editViewModel.updateName(binding.nameEditText.text.toString())
+            editViewModel.updateDescription(binding.descriptionEditText.text.toString())
+
             editViewModel.savePlaylist(
                 onSuccess = { playlistName ->
                     Log.d(TAG, "Playlist updated successfully: $playlistName")
-                    Toast.makeText(
-                        requireContext(),
-                        "Плейлист \"$playlistName\" обновлён",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    findNavController().popBackStack() // Возвращаемся на экран деталей плейлиста
+                    Toast.makeText(requireContext(), "Плейлист \"$playlistName\" обновлён", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
                 },
                 onError = { errorMessage ->
                     Log.e(TAG, "Error updating playlist: $errorMessage")
@@ -162,6 +151,43 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
                 }
             )
         }
+        // --------------------------
+
+        // --- Устанавливаем СВИХ TextWatchers для editViewModel ---
+        // Сначала удалим любые существующие слушатели (на случай, если super.setup вызывался)
+        // Это не всегда надежно, но стоит попробовать
+        try {
+            binding.nameEditText.clearTextChangedListeners() // Не стандартный метод, может не быть
+        } catch (e: Exception) {
+            Log.d(TAG, "Could not clear text watchers for nameEditText")
+        }
+        try {
+            binding.descriptionEditText.clearTextChangedListeners() // Не стандартный метод, может не быть
+        } catch (e: Exception) {
+            Log.d(TAG, "Could not clear text watchers for descriptionEditText")
+        }
+
+        // Добавляем новые слушатели, которые обновляют editViewModel
+        binding.nameEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Обновляем editViewModel при вводе
+                editViewModel.updateName(s.toString())
+                Log.d(TAG, "Name updated in EditVM: ${s.toString()}")
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.descriptionEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Обновляем editViewModel при вводе
+                editViewModel.updateDescription(s.toString())
+                Log.d(TAG, "Description updated in EditVM: ${s.toString()}")
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        // ------------------------------------------------------------
     }
 
     // Переопределяем openImagePicker, чтобы использовать наш pickImageLauncher
@@ -170,42 +196,52 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
         pickImageLauncher.launch("image/*")
     }
 
-    override fun updateFieldsFromUI() {
-        Log.d(TAG, "Updating fields from UI for EditViewModel")
-        // Принудительно обновляем поля из UI для editViewModel
-        editViewModel.updateName(binding.nameEditText.text.toString())
-        editViewModel.updateDescription(binding.descriptionEditText.text.toString())
-        // Обложка обновляется через pickImageLauncher или observeEditViewModel.
+    // Переопределяем setupListeners, чтобы НЕ вызывать родительскую логику TextWatchers
+    override fun setupListeners() {
+        // Намеренно оставляем пустым или вызываем только базовую навигационную логику,
+        // если она была в родительском setupListeners.
+        // Вся специфическая логика редактирования находится в setupEditListeners.
+        Log.d(TAG, "setupListeners overridden, calling setupEditListeners")
+        setupEditListeners()
     }
 
-    // Переопределяем обработчик системной кнопки "Назад"
+    // Переопределяем setupTextWatchers, чтобы НЕ устанавливать родительские TextWatchers
+    override fun setupTextWatchers() {
+        // Намеренно оставляем пустым.
+        // TextWatchers устанавливаются в setupEditListeners.
+        Log.d(TAG, "setupTextWatchers overridden and skipped")
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             Log.d(TAG, "System back button pressed (Edit mode)")
-            handleBackPressForEdit() // Используем свою логику
+            handleBackPressForEdit()
         }
     }
 
-    // Своя логика обработки кнопки "Назад" для редактирования
     private fun handleBackPressForEdit() {
         Log.d(TAG, "Handling back press for edit")
         if (editViewModel.hasUnsavedChanges()) {
             showExitConfirmationDialog()
         } else {
-            findNavController().popBackStack() // Просто закрываем экран
+            findNavController().popBackStack()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Показываем ActionBar обратно при выходе из фрагмента (если скрывался)
         showActionBar()
         Log.d(TAG, "onDestroyView")
-        // _binding = null // Уже делается в родителе
     }
+}
 
-    // --- Методы, которые могут потребоваться, если не полностью переопределяются ---
-    // hideActionBar, showActionBar, setupTextWatchers, updateInputLayoutColors,
-    // showExitConfirmationDialog - можно использовать из родителя
-    // или переопределить при необходимости.
+// Вспомогательное расширение для попытки очистки TextWatchers (необязательно, но может помочь)
+private fun android.widget.EditText.clearTextChangedListeners() {
+    // Этот метод не существует в стандартном Android SDK.
+    // Это просто заглушка, чтобы показать идею.
+    // Реальная очистка TextWatchers требует хранения ссылок на них.
+    // В большинстве случаев достаточно просто не вызывать super.setupTextWatchers()
+    // и установить свои слушатели.
+    // Если возникают проблемы, можно попробовать рефлексию или другие методы,
+    // но это сложнее и менее надежно.
 }

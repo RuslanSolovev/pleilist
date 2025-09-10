@@ -78,8 +78,8 @@ class PlaylistRepositoryImpl(
             return false // Трек уже добавлен
         }
 
-        // Добавляем новый trackId
-        currentTrackIds.add(track.trackId)
+
+        currentTrackIds.add(0, track.trackId)
 
         // 4. Обновляем плейлист
         val updatedEntity = playlistEntity.copy(
@@ -145,14 +145,20 @@ class PlaylistRepositoryImpl(
 
     override suspend fun getTracksForPlaylist(trackIds: List<Int>): List<Track> {
         if (trackIds.isEmpty()) return emptyList()
+
+        // Получаем все треки по IDs
         val trackEntities = trackForPlaylistDao.getTracksByIds(trackIds)
-        return trackEntities.map { it.toDomain() }
+
+        // Создаем map для быстрого поиска треков по ID
+        val trackMap = trackEntities.associateBy { it.trackId }
+
+        // Возвращаем треки в том же порядке, что и в trackIds (новые сверху)
+        return trackIds.mapNotNull { trackMap[it] }.map { it.toDomain() }
     }
 
-    // --- НОВЫЙ МЕТОД: Получение всех плейлистов синхронно (для анализа) ---
+
     override suspend fun getAllPlaylistsSync(): List<Playlist> {
-        // Предполагается, что playlistDao.getAllPlaylistsSync() возвращает List<PlaylistEntity>
-        // Если такого метода нет, см. пункт 5 ниже.
+
         return try {
             playlistDao.getAllPlaylistsSync().map { it.toDomain() }
         } catch (e: Exception) {

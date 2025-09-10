@@ -511,19 +511,25 @@ class PlaylistDetailsFragment : Fragment(), OnTrackClickListener {
     // --- Реализация методов интерфейса OnTrackClickListener ---
     override fun onItemClick(track: Track) {
         Log.d(TAG, "Track clicked: ${track.trackName} - ${track.artistName}")
-        // Toast.makeText(requireContext(), "Track: ${track.trackName}", Toast.LENGTH_SHORT).show()
 
-        // Создаем Bundle с аргументами
+        // Создаем Bundle с ВСЕМИ аргументами трека
         val bundle = Bundle().apply {
-            // Убедитесь, что trackId типа Int. Если Long, используйте putLong
             putInt("TRACK_ID", track.trackId)
+            putString("TRACK_NAME", track.trackName)
+            putString("ARTIST_NAME", track.artistName)
+            putString("ARTWORK_URL", track.artworkUrl100)
+            putString("COLLECTION_NAME", track.collectionName)
+            putString("RELEASE_DATE", track.releaseDate)
+            putString("PRIMARY_GENRE", track.primaryGenreName)
+            putString("COUNTRY", track.country)
+            track.trackTimeMillis?.let { putLong("TRACK_TIME_MILLIS", it) }
+            putString("PREVIEW_URL", track.previewUrl)
         }
 
         try {
-            // Переходим к PlayerFragment, передавая аргументы в Bundle
-            // Убедитесь, что R.id.playerFragment - это правильный ID из вашего nav_graph.xml
+            // Переходим к PlayerFragment, передавая все данные трека
             findNavController().navigate(R.id.playerFragment, bundle)
-            Log.d(TAG, "Navigating to PlayerFragment with trackId: ${track.trackId}")
+            Log.d(TAG, "Navigating to PlayerFragment with track data for ID: ${track.trackId}")
         } catch (e: Exception) {
             Log.e(TAG, "Error navigating to PlayerFragment", e)
             Toast.makeText(requireContext(), "Ошибка перехода к плееру", Toast.LENGTH_SHORT).show()
