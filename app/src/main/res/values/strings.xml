@@ -22,7 +22,8 @@
     <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="vi_iskali">Вы искали</string>
     <string name="ocistit">Очистить</string>
-
+    <string name="edit_information">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
     <string name="dlit">Длительность</string>
     <string name="albom">Альбом</string>
     <string name="god">Год</string>
@@ -39,16 +40,17 @@
 
     <string name="cant_open_terms">Не удалось открыть условия использования</string>
 
+    <string name="edit_playlist_title">Редактировать</string>
 
     <string name="tab_playlists">Плейлисты</string>
     <string name="tab_favorites">Избранные треки</string>
     <!-- Экран "Медиатека" -->
     <string name="media_library_title">Медиатека</string>
-
+    <string name="playlist_empty_tracks_message">В этом плейлисте нет треков</string>
     <!-- Заглушки -->
     <string name="no_favorites_placeholder">Ваша медиатека пуста</string>
     <string name="no_playlists_placeholder">Вы не создали\nни одного плейлиста</string>
-
+    <string name="save_button_text">Сохранить</string>
     <!-- Кнопка -->
     <string name="create_playlist">Новый плейлист</string>
 
@@ -63,6 +65,48 @@
     <string name="one_track">трек</string>
     <string name="few_tracks">трека</string>
     <string name="many_tracks">треков</string>
+
+    <string name="back">Back</string>
+    <string name="playlist_cover">Playlist cover</string>
+    <string name="share">Share</string>
+    <string name="menu">Menu</string>
+    <string name="tracks">Tracks</string>
+    <string name="tracks_list_placeholder">Track list will be implemented later</string>
+    <string name="total_duration">Total duration: %1$s</string>
+    <string name="tracks_count_singular">%1$d track</string>
+    <string name="tracks_count_plural">%1$d tracks</string>
+    <string name="playlists_title">Playlists</string>
+    <string name="create_playlist_title">New Playlist</string>
+    <string name="playlist_details_title">Playlist</string>
+
+
+    <string name="error">Error</string>
+    <string name="error_loading_playlist">Error loading playlist</string>
+
+
+
+        <!-- Форматирование общей информации: "X минут • Y треков" -->
+    <string name="playlist_info_format">%1$s • %2$s</string>
+
+        <!-- Продолжительность трека/плейлиста -->
+    <string name="duration_minutes_zero">0 минут</string>
+    <string name="duration_minutes_one">%1$d минута</string>
+    <string name="duration_minutes_few">%1$d минуты</string>
+    <string name="duration_minutes_many">%1$d минут</string>
+
+        <!-- Альтернативный вариант для общего времени плейлиста (если формат другой) -->
+    <string name="total_duration_minutes_zero">0 минут</string>
+    <string name="total_duration_minutes_one">%1$d минута</string>
+    <string name="total_duration_minutes_few">%1$d минуты</string>
+    <string name="total_duration_minutes_many">%1$d минут</string>
+
+        <!-- Количество треков -->
+    <string name="tracks_count_zero">0 треков</string>
+    <string name="tracks_count_one">%1$d трек</string>
+    <string name="tracks_count_few">%1$d трека</string>
+    <string name="tracks_count_many">%1$d треков</string>
+
+
 
 </resources>
 

@@ -12,4 +12,15 @@ interface TrackForPlaylistDao {
 
     @Query("SELECT * FROM tracks_for_playlists WHERE trackId = :trackId")
     suspend fun getTrackById(trackId: Int): TrackForPlaylistEntity?
+
+    @Query("SELECT * FROM tracks_for_playlists WHERE trackId IN (:trackIds)")
+    suspend fun getTracksByIds(trackIds: List<Int>): List<TrackForPlaylistEntity>
+
+    // --- Добавлен метод для удаления трека по trackId ---
+    @Query("DELETE FROM tracks_for_playlists WHERE trackId = :trackId")
+    suspend fun deleteByTrackId(trackId: Int)
+    // -----------------------------------------------------
+
+
+
 }

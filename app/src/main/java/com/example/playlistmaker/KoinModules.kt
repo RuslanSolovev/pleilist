@@ -23,6 +23,10 @@ import com.example.playlistmaker.domain.usecase.AddTrackToPlaylistUseCase
 import com.example.playlistmaker.domain.usecase.CreatePlaylistUseCase
 import com.example.playlistmaker.domain.usecase.DeletePlaylistUseCase
 import com.example.playlistmaker.domain.usecase.GetAllPlaylistsUseCase
+import com.example.playlistmaker.domain.usecase.GetPlaylistByIdUseCase
+import com.example.playlistmaker.domain.usecase.GetTracksForPlaylistUseCase
+import com.example.playlistmaker.domain.usecase.RemoveTrackFromPlaylistUseCase
+import com.example.playlistmaker.domain.usecase.UpdatePlaylistUseCase
 
 import com.example.playlistmaker.domain.usecases.ToggleLikeUseCase
 import com.example.playlistmaker.domain.util.TimeFormatter
@@ -126,6 +130,10 @@ val interactorModule = module {
     single { ToggleLikeUseCase(get()) }
     single { TimeFormatter }
     single { AddTrackToPlaylistUseCase (get())}
+    single { GetTracksForPlaylistUseCase(get()) }
+    single { GetPlaylistByIdUseCase(get()) }
+    single { RemoveTrackFromPlaylistUseCase(get()) }
+    single { UpdatePlaylistUseCase(get()) }
 }
 
 val viewModelModule = module {
@@ -137,6 +145,8 @@ val viewModelModule = module {
     viewModel { PlayerViewModel(get()) }
     viewModel { CreatePlaylistViewModel(get(), androidContext()) }
     viewModel { PlaylistsViewModel(get(), get()) }
+    viewModel { PlaylistDetailsViewModel(get(), get(), get(), get()) }
+    viewModel { EditPlaylistViewModel(get(), get(), get(), androidContext()) }
 }
 
 val appModules = listOf(

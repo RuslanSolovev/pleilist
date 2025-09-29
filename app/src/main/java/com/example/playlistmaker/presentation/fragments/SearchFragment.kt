@@ -1,10 +1,12 @@
 package com.example.playlistmaker.presentation.fragments
 
+
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -26,7 +28,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.presentation.adapter.OnTrackClickListener
 import com.example.playlistmaker.presentation.adapter.TrackAdapter
+
 import com.example.playlistmaker.presentation.ui.PlaceholderRenderer
 import com.example.playlistmaker.presentation.viewmodel.SearchState
 import com.example.playlistmaker.presentation.viewmodel.SearchViewModel
@@ -122,17 +126,51 @@ class SearchFragment : Fragment() {
 
     private fun setupRecyclerViews(lifecycleOwner: LifecycleOwner) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Создаем объект-слушатель для результатов поиска
+        val searchTrackClickListener = object : OnTrackClickListener {
+            override fun onItemClick(track: Track) {
+                handleTrackClick(track)
+            }
+
+            override fun onItemLongClick(track: Track) {
+                // Для результатов поиска долгий клик, вероятно, не нужен для удаления
+                // Можно показать Toast или ничего не делать
+                // Toast.makeText(requireContext(), "Долгий клик: ${track.trackName}", Toast.LENGTH_SHORT).show()
+                Log.d("SearchFragment", "Long click on search result: ${track.trackName}")
+            }
+        }
+
+        // Передаем объект-слушатель в конструктор адаптера
         trackAdapter = TrackAdapter(
-            requireContext(),
-            lifecycleOwner.lifecycleScope
-        ) { track -> handleTrackClick(track) }
+            context = requireContext(),
+            lifecycleScope = lifecycleOwner.lifecycleScope,
+            onTrackClickListener = searchTrackClickListener // <<< Передаем OnTrackClickListener
+        )
         recyclerView.adapter = trackAdapter
 
         historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Создаем объект-слушатель для истории поиска
+        val historyTrackClickListener = object : OnTrackClickListener {
+            override fun onItemClick(track: Track) {
+                handleTrackClick(track)
+            }
+
+            override fun onItemLongClick(track: Track) {
+                // Для истории долгий клик тоже может не быть нужен
+                // Можно показать Toast или ничего не делать
+                // Toast.makeText(requireContext(), "Долгий клик по истории: ${track.trackName}", Toast.LENGTH_SHORT).show()
+                Log.d("SearchFragment", "Long click on history item: ${track.trackName}")
+            }
+        }
+
+        // Передаем объект-слушатель в конструктор адаптера для истории
         historyAdapter = TrackAdapter(
-            requireContext(),
-            lifecycleOwner.lifecycleScope
-        ) { track -> handleTrackClick(track) }
+            context = requireContext(),
+            lifecycleScope = lifecycleOwner.lifecycleScope,
+            onTrackClickListener = historyTrackClickListener // <<< Передаем OnTrackClickListener
+        )
         historyRecyclerView.adapter = historyAdapter
     }
 

@@ -132,4 +132,21 @@
         <item name="android:background">@color/white</item>
     </style>
 
+    <style name="dtn_noz">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="dtn_noz2">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="RoundedBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/RoundedBottomSheetStyle</item>
+    </style>
+
+    <style name="RoundedBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+
 </resources>

@@ -27,10 +27,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+    var _binding: FragmentCreatePlaylistBinding? = null
+    val binding get() = _binding!!
     private val viewModel: CreatePlaylistViewModel by viewModel()
 
     private val pickImageLauncher = registerForActivityResult(
@@ -71,21 +71,21 @@ class CreatePlaylistFragment : Fragment() {
         })
     }
 
-    private fun hideActionBar() {
+    fun hideActionBar() {
         // Скрываем ActionBar только для этого фрагмента
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.hide()
         }
     }
 
-    private fun showActionBar() {
+    fun showActionBar() {
         // Показываем ActionBar при выходе из фрагмента
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.show()
         }
     }
 
-    private fun setupListeners() {
+    open fun setupListeners() {
         Log.d("CreatePlaylistFragment", "Setting up listeners")
 
         binding.backButton.setOnClickListener {
@@ -123,7 +123,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun setupTextWatchers() {
+    open fun setupTextWatchers() {
         binding.nameEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -154,7 +154,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun updateInputLayoutColors(inputLayout: TextInputLayout, hasText: Boolean, hasFocus: Boolean) {
+    fun updateInputLayoutColors(inputLayout: TextInputLayout, hasText: Boolean, hasFocus: Boolean) {
         val blueColor = ContextCompat.getColor(requireContext(), R.color.blue_primary)
         val hintColor = ContextCompat.getColor(requireContext(), R.color.text_hint)
         val strokeColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
@@ -180,7 +180,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun updateFieldsFromUI() {
+    open fun updateFieldsFromUI() { // <-- Добавлено 'open'
         // Принудительно обновляем поля из UI
         viewModel.updateName(binding.nameEditText.text.toString())
         viewModel.updateDescription(binding.descriptionEditText.text.toString())
@@ -210,7 +210,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun openImagePicker() {
+    open fun openImagePicker() {
         Log.d("CreatePlaylistFragment", "Opening image picker")
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
             type = "image/*"
@@ -232,7 +232,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun showExitConfirmationDialog() {
+    fun showExitConfirmationDialog() {
         Log.d("CreatePlaylistFragment", "Showing exit confirmation dialog")
         AlertDialog.Builder(requireContext())
             .setTitle("Завершить создание плейлиста?")

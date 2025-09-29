@@ -17,12 +17,12 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val createPlaylistUseCase: CreatePlaylistUseCase,
     private val context: Context
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CreatePlaylistState())
+    val _uiState = MutableStateFlow(CreatePlaylistState())
     val uiState: StateFlow<CreatePlaylistState> = _uiState.asStateFlow()
 
     fun updateName(name: String) {
@@ -40,7 +40,7 @@ class CreatePlaylistViewModel(
         _uiState.value = _uiState.value.copy(coverImageUri = coverImageUri)
     }
 
-    fun createPlaylist(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    open fun createPlaylist(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val state = _uiState.value
         if (state.name.isNotBlank()) {
             _uiState.value = _uiState.value.copy(isCreateButtonEnabled = false)
@@ -84,14 +84,14 @@ class CreatePlaylistViewModel(
         }
     }
 
-    fun hasUnsavedChanges(): Boolean {
+    open fun hasUnsavedChanges(): Boolean {
         val state = _uiState.value
         return state.name.isNotBlank() ||
                 state.description.isNotBlank() ||
                 state.coverImageUri != null
     }
 
-    private suspend fun copyCoverImageToInternalStorage(uri: Uri?): String? {
+    suspend fun copyCoverImageToInternalStorage(uri: Uri?): String? {
         if (uri == null) return null
 
         return try {

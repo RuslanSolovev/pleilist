@@ -28,7 +28,7 @@ class PlaceholderRenderer(
         textView.isVisible = true
         retryButton.isVisible = false
 
-        imageView.setImageResource(R.drawable.light_mode)
+        imageView.setImageResource(R.drawable.podelit)
         textView.text = context.getString(R.string.no_results)
     }
 

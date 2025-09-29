@@ -17,10 +17,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// --- Интерфейс для обработки кликов по треку ---
+interface OnTrackClickListener {
+    fun onItemClick(track: Track)
+    fun onItemLongClick(track: Track)
+}
+// ------------------------------------------------
+
 class TrackAdapter(
     private val context: Context,
     private val lifecycleScope: CoroutineScope,
-    private val onItemClick: (Track) -> Unit
+    private val onTrackClickListener: OnTrackClickListener // <<< Принимаем интерфейс
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     private var tracks = emptyList<Track>()
@@ -29,8 +36,8 @@ class TrackAdapter(
 
     private val cornerRadius = context.resources.getDimensionPixelSize(R.dimen.corner_radius_small)
     private val glideOptions = RequestOptions()
-        .placeholder(R.drawable.placeholder)
-        .error(R.drawable.placeholder)
+        .placeholder(R.drawable.placeholder_vector)
+        .error(R.drawable.placeholder_vector)
         .transform(RoundedCorners(cornerRadius))
 
     fun updateTracks(newTracks: List<Track>) {
@@ -45,7 +52,7 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
+        holder.bind(tracks[position], onTrackClickListener) // <<< Передаем listener
     }
 
     override fun getItemCount(): Int = tracks.size
@@ -56,25 +63,34 @@ class TrackAdapter(
         private val artistName: TextView = itemView.findViewById(R.id.artist_name_text_view)
         private val trackTime: TextView = itemView.findViewById(R.id.track_time_text_view)
 
-        fun bind(track: Track) {
+        fun bind(track: Track, clickListener: OnTrackClickListener) { // <<< Принимаем listener
             trackName.text = track.trackName ?: context.getString(R.string.unknown_track)
             artistName.text = track.artistName ?: context.getString(R.string.unknown_artist)
             trackTime.text = track.trackTime ?: ""
 
             loadArtwork(track.artworkUrl100)
 
+            // --- Обработчик обычного клика с debounce ---
             itemView.setOnClickListener {
                 lastClickJob?.cancel()
                 lastClickJob = lifecycleScope.launch {
                     delay(clickDebounceTime)
-                    onItemClick(track)
+                    clickListener.onItemClick(track) // <<< Вызываем метод listener'а
                 }
             }
+            // ---------------------------------------------
+
+            // --- Обработчик долгого клика ---
+            itemView.setOnLongClickListener {
+                clickListener.onItemLongClick(track) // <<< Вызываем метод listener'а
+                true // Возвращаем true, чтобы показать, что событие обработано
+            }
+            // ---------------------------------
         }
 
         private fun loadArtwork(url: String?) {
             if (url.isNullOrEmpty()) {
-                artwork.setImageResource(R.drawable.placeholder)
+                artwork.setImageResource(R.drawable.placeholder_vector)
             } else {
                 Glide.with(context)
                     .load(url)
