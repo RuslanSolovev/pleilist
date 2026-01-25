@@ -89,12 +89,12 @@
 ### **Основные экраны**
 | | | |
 |:---:|:---:|:---:|
-| **Экран поиска** | **Результаты поиска** | **Просмотр трека** |
-| <img src="screen1_search.jpg" width="200"> | <img src="screen2_results.jpg" width="200"> | <img src="screen3_track_detail.jpg" width="200"> |
-| **Библиотека (Избранное)** | **Создание альбома** | **Настройки (Темы)** |
-| <img src="screen4_favorites.jpg" width="200"> | <img src="screen5_create_album.jpg" width="200"> | <img src="screen6_settings.jpg" width="200"> |
+| **Трек ** | **История поиска** | **Избранные треки** |
+| <img src="trek.jpg" width="200"> | <img src="istoriy_poiska.jpg" width="200"> | <img src="izbronie_treki2.jpg" width="200"> |
+| **Плейлисты** | **Настройки (светлая тема)** | **Настройки (темная тема)** |
+| <img src="pley_list.jpg" width="200"> | <img src="nastroiki_svetlay.jpg" width="200"> | <img src="nastroiki_temnay.jpg" width="200"> |
 
-*Скриншоты демонстрируют основные возможности приложения*
+*Для просмотра в полном размере кликните на изображение*
 
 🎯 Цели обучения
 Этот проект демонстрирует:
@@ -108,6 +108,13 @@
 Современный UI с Jetpack Compose
 
 Асинхронное программирование (Coroutines/Flow)
+
+
+## 👨‍💻 **Контакты**
+*   Автор: [Руслан Соловьев]
+*   Email: [solovevrus1993@gmail.com]
+*   GitHub: [https://github.com/RuslanSolovev]
+
 
 Dependency Injection
 
